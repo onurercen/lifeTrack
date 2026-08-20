@@ -1,0 +1,309 @@
+2026.08.20 15:24:50 INFO  Started: Metals version 1.6.8 in folders '/Users/onurercen/Desktop/lifeTrack' for client Visual Studio Code 1.132.0.
+2026.08.20 15:24:50 INFO  Memory monitor started
+2026.08.20 15:24:50 WARN  Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026.08.20 15:24:51 WARN  Could not calculate checksum for mvn in /Users/onurercen/Desktop/lifeTrack
+2026.08.20 15:24:51 WARN  Build server is not auto-connectable.
+2026.08.20 15:24:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+2026.08.20 15:24:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
+2026.08.20 15:24:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:24:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/LifeTrackApplication.java
+2026.08.20 15:24:51 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:24:51 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:25:15 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:15 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+Ağu 20, 2026 3:25:15 ÖS org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1
+2026.08.20 15:25:15 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:18 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:25:18 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:23 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:25 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:25 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:31 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:31 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:31 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:31 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:31 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Output:
+
+2026.08.20 15:25:32 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:25:32 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:25:32 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:21 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:32:21 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:24 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:29 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+Ağu 20, 2026 3:32:30 ÖS org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 127
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:30 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:32 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:32 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:33 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:34 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:35 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:38 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:37 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:38 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:38 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:38 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:39 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:32:39 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:40 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:40 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+2026.08.20 15:32:40 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:41 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:41 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:42 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:42 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:42 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:43 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:42 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:42 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:44 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:45 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:45 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:45 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:46 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+2026.08.20 15:32:46 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:49 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:49 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:32:49 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:49 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:49 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:49 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:50 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
+2026.08.20 15:32:50 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:51 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:52 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:57 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:57 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:32:57 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:01 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:01 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:01 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:01 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:03 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
+2026.08.20 15:33:03 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:04 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:04 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:33:04 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:04 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:04 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:05 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
+2026.08.20 15:33:05 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:04 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:06 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
+2026.08.20 15:33:06 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:07 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:08 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:09 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:11 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:11 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:11 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:10 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:11 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:13 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:12 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:13 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:13 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:13 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:14 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:14 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:13 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:14 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:14 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:14 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:14 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:15 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
+2026.08.20 15:33:15 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:16 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:16 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:16 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:16 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:16 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:20 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:20 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:20 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:20 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:20 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:21 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:21 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:22 WARN  Running javac-semanticdb failed for file:///Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Output:
+
+2026.08.20 15:33:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:21 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.
+2026.08.20 15:33:22 WARN  no build target for: /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
+2026.08.20 15:33:22 INFO  no build target found for /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java. Using fallback presentation compiler.

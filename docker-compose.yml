@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: lifetrack-postgres
+    environment:
+      POSTGRES_DB: lifetrack
+      POSTGRES_USER: lifetrack
+      POSTGRES_PASSWORD: lifetrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
