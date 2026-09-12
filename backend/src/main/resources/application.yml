@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: lifetrack
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lifetrack
+    username: lifetrack
+    password: lifetrack
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8080
+
+jwt:
+  secret: lifeTrack-super-secret-key-change-this-value
+  expiration: 86400000
