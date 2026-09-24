@@ -13,8 +13,8 @@ public class UserController {
         return "User service is running";
     }
 
-    @GetMapping("/books")
-    public String getUserBooks(){
-        return "User's books";
+    @GetMapping("/me")
+    public String getCurrentUserProfile() {
+        return "User profile";
     }
 }

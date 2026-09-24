@@ -1,6 +1,3 @@
-/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/CorsConfig.java
-/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/OpenApiConfig.java
-/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/config/SecurityConfig.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/LifeTrackApplication.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/auth/controller/AuthController.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/auth/dto/AuthResponse.java
@@ -9,6 +6,12 @@
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/auth/dto/UserResponse.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/auth/service/AuthService.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/controller/BookController.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/dto/BookResponse.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/dto/CreateBookRequest.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/entity/Book.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/repository/BookRepository.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/book/service/BookService.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/config/CorsConfig.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/config/OpenApiConfig.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/config/SecurityConfig.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/exception/ApiException.java
@@ -16,7 +19,17 @@
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/security/JwtAuthenticationFilter.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/common/security/JwtService.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/controller/MediaController.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/dto/CreateMediaRequest.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/dto/MediaResponse.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/entity/Media.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/repository/MediaRepository.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/media/service/MediaService.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/controller/RunController.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/dto/CreateRunRequest.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/dto/RunResponse.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/entity/Run.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/repository/RunRepository.java
+/Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/run/service/RunService.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/user/controller/UserController.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/user/entity/User.java
 /Users/onurercen/Desktop/lifeTrack/backend/src/main/java/com/lifetrack/user/repository/UserRepository.java
