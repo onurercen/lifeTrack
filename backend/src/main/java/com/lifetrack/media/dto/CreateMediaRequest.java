@@ -1,21 +1,25 @@
 package com.lifetrack.media.dto;
 
+import com.lifetrack.common.util.Strings;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.URL;
 
 public class CreateMediaRequest {
 
     @NotBlank(message = "Medya başlığı zorunludur")
+    @Size(max = 255, message = "Başlık en fazla 255 karakter olabilir")
     private String title;
 
     @NotBlank(message = "Tür zorunludur")
+    @Size(max = 255, message = "Tür en fazla 255 karakter olabilir")
     private String type;
 
-    @NotBlank(message = "URL zorunludur")
+    @URL(message = "Geçerli bir bağlantı giriniz")
+    @Size(max = 2048, message = "Bağlantı en fazla 2048 karakter olabilir")
     private String url;
 
-    @NotBlank(message = "Açıklama zorunludur")
-    @Size(min = 3, message = "Açıklama en az 3 karakter olmalıdır")
+    @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
     private String description;
 
     public String getTitle() {
@@ -38,8 +42,9 @@ public class CreateMediaRequest {
         return url;
     }
 
+    // Normalised before validation so a blank link counts as "no link".
     public void setUrl(String url) {
-        this.url = url;
+        this.url = Strings.trimToNull(url);
     }
 
     public String getDescription() {

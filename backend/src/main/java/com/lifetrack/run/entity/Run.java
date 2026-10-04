@@ -19,7 +19,6 @@ public class Run {
     @Column(nullable = false)
     private Integer durationMinutes;
 
-    @Column(nullable = false)
     private Integer caloriesBurned;
 
     @Column(length = 500)
@@ -29,12 +28,19 @@ public class Run {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /** When the run happened (user supplied, defaults to when it was recorded). */
+    @Column(nullable = false)
+    private LocalDateTime runAt;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        if (runAt == null) {
+            runAt = createdAt;
+        }
     }
 
     public Run() {
@@ -86,6 +92,14 @@ public class Run {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public LocalDateTime getRunAt() {
+        return runAt;
+    }
+
+    public void setRunAt(LocalDateTime runAt) {
+        this.runAt = runAt;
     }
 
     public LocalDateTime getCreatedAt() {

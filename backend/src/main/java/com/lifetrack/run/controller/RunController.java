@@ -6,14 +6,14 @@ import com.lifetrack.run.service.RunService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/runs")
 public class RunController {
 
     private final RunService runService;
@@ -22,24 +22,32 @@ public class RunController {
         this.runService = runService;
     }
 
-    @GetMapping("/runs/health")
-    public String health() {
-        return "Run service is running";
+    @GetMapping
+    public ResponseEntity<List<RunResponse>> getRuns(@AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(runService.getRunsByUser(principal.getUsername()));
     }
 
-    @GetMapping("/runs")
-    public ResponseEntity<List<RunResponse>> getRuns() {
-        return ResponseEntity.ok(runService.getRunsByUser(getCurrentUserEmail()));
-    }
-
-    @PostMapping("/runs")
-    public ResponseEntity<RunResponse> createRun(@Valid @RequestBody CreateRunRequest request) {
+    @PostMapping
+    public ResponseEntity<RunResponse> createRun(
+        @Valid @RequestBody CreateRunRequest request,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(runService.createRun(request, getCurrentUserEmail()));
+            .body(runService.createRun(request, principal.getUsername()));
     }
 
-    private String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getName() : null;
+    @PutMapping("/{id}")
+    public ResponseEntity<RunResponse> updateRun(
+        @PathVariable Long id,
+        @Valid @RequestBody CreateRunRequest request,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
+        return ResponseEntity.ok(runService.updateRun(id, request, principal.getUsername()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRun(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
+        runService.deleteRun(id, principal.getUsername());
+        return ResponseEntity.noContent().build();
     }
 }

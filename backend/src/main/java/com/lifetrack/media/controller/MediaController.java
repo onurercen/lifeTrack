@@ -6,14 +6,14 @@ import com.lifetrack.media.service.MediaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/media")
 public class MediaController {
 
     private final MediaService mediaService;
@@ -22,29 +22,35 @@ public class MediaController {
         this.mediaService = mediaService;
     }
 
-    @GetMapping("/media/health")
-    public String health() {
-        return "Media service is running";
+    @GetMapping
+    public ResponseEntity<List<MediaResponse>> getMedia(
+        @RequestParam(required = false) String query,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
+        return ResponseEntity.ok(mediaService.searchMedia(query, principal.getUsername()));
     }
 
-    @GetMapping("/media/search")
-    public ResponseEntity<List<MediaResponse>> searchMedia(@RequestParam(required = false) String query) {
-        return ResponseEntity.ok(mediaService.searchMedia(query, getCurrentUserEmail()));
-    }
-
-    @GetMapping("/users/media")
-    public ResponseEntity<List<MediaResponse>> getUserMedia() {
-        return ResponseEntity.ok(mediaService.getUserMedia(getCurrentUserEmail()));
-    }
-
-    @PostMapping("/user/media")
-    public ResponseEntity<MediaResponse> createMedia(@Valid @RequestBody CreateMediaRequest request) {
+    @PostMapping
+    public ResponseEntity<MediaResponse> createMedia(
+        @Valid @RequestBody CreateMediaRequest request,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(mediaService.createMedia(request, getCurrentUserEmail()));
+            .body(mediaService.createMedia(request, principal.getUsername()));
     }
 
-    private String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getName() : null;
+    @PutMapping("/{id}")
+    public ResponseEntity<MediaResponse> updateMedia(
+        @PathVariable Long id,
+        @Valid @RequestBody CreateMediaRequest request,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
+        return ResponseEntity.ok(mediaService.updateMedia(id, request, principal.getUsername()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMedia(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
+        mediaService.deleteMedia(id, principal.getUsername());
+        return ResponseEntity.noContent().build();
     }
 }

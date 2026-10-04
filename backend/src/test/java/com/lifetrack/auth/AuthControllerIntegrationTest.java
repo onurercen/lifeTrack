@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -70,7 +71,7 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.message").value("Giriş bilgileri hatalı"));
     }
 
@@ -86,6 +87,20 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    void cors_shouldAllowLocalDevServerOnAnyPortButNotOtherOrigins() throws Exception {
+        mockMvc.perform(options("/api/auth/login")
+                .header("Origin", "http://localhost:54321")
+                .header("Access-Control-Request-Method", "POST"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:54321"));
+
+        mockMvc.perform(options("/api/auth/login")
+                .header("Origin", "https://evil.example.com")
+                .header("Access-Control-Request-Method", "POST"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     void register_shouldRejectDuplicateEmail() throws Exception {
         register("duplicate@test.com", "123456");
 
@@ -97,8 +112,56 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isConflict())
             .andExpect(jsonPath("$.message").value("Bu e-posta ile kayıtlı kullanıcı mevcut"));
+    }
+
+    @Test
+    void token_fromLogin_shouldAuthenticateProtectedEndpoints() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Token User");
+        request.setEmail("token@test.com");
+        request.setPassword("123456");
+
+        String body = mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andReturn().getResponse().getContentAsString();
+        String token = objectMapper.readTree(body).get("token").asText();
+
+        mockMvc.perform(get("/api/users/me").header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value("token@test.com"));
+    }
+
+    @Test
+    void emails_shouldBeCaseInsensitive() throws Exception {
+        RegisterRequest request = new RegisterRequest();
+        request.setName("Ayşe");
+        request.setEmail("  Ayse.Case@Test.COM ");
+        request.setPassword("123456");
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.user.email").value("ayse.case@test.com"));
+
+        mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"email": "AYSE.CASE@test.com", "password": "123456"}
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.user.email").value("ayse.case@test.com"));
+
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"name": "Kopya", "email": "ayse.case@TEST.com", "password": "654321"}
+                    """))
+            .andExpect(status().isConflict());
     }
 
     private void register(String email, String password) throws Exception {

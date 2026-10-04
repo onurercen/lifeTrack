@@ -9,8 +9,9 @@ import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import static com.lifetrack.common.util.Strings.trimToNull;
+
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class BookService {
@@ -25,35 +26,44 @@ public class BookService {
 
     public BookResponse createBook(CreateBookRequest request, String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new ApiException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> ApiException.notFound("Kullanıcı bulunamadı"));
 
         Book book = new Book();
-        book.setTitle(request.getTitle().trim());
-        book.setAuthor(request.getAuthor().trim());
-        book.setDescription(request.getDescription().trim());
+        applyRequest(book, request);
         book.setUser(user);
 
         Book saved = bookRepository.save(book);
         return toResponse(saved);
     }
 
-    public List<BookResponse> getUserBooks(String email) {
-        return bookRepository.findByUserEmailOrderByCreatedAtDesc(email)
-            .stream()
-            .map(this::toResponse)
-            .toList();
+    public BookResponse updateBook(Long id, CreateBookRequest request, String email) {
+        Book book = findOwnedBook(id, email);
+        applyRequest(book, request);
+        return toResponse(bookRepository.save(book));
+    }
+
+    public void deleteBook(Long id, String email) {
+        bookRepository.delete(findOwnedBook(id, email));
     }
 
     public List<BookResponse> searchBooks(String query, String email) {
         String normalized = query == null ? "" : query.trim();
-        return bookRepository.findByUserEmailOrderByCreatedAtDesc(email)
-            .stream()
-            .filter(book -> normalized.isEmpty()
-                || book.getTitle().toLowerCase(Locale.ROOT).contains(normalized.toLowerCase(Locale.ROOT))
-                || book.getAuthor().toLowerCase(Locale.ROOT).contains(normalized.toLowerCase(Locale.ROOT))
-                || book.getDescription().toLowerCase(Locale.ROOT).contains(normalized.toLowerCase(Locale.ROOT)))
-            .map(this::toResponse)
-            .toList();
+        List<Book> books = normalized.isEmpty()
+            ? bookRepository.findByUserEmailOrderByCreatedAtDesc(email)
+            : bookRepository.search(email, normalized);
+        return books.stream().map(this::toResponse).toList();
+    }
+
+    // Another user's book is reported as missing, so ids can't be probed.
+    private Book findOwnedBook(Long id, String email) {
+        return bookRepository.findByIdAndUserEmail(id, email)
+            .orElseThrow(() -> ApiException.notFound("Kitap bulunamadı"));
+    }
+
+    private void applyRequest(Book book, CreateBookRequest request) {
+        book.setTitle(request.getTitle().trim());
+        book.setAuthor(request.getAuthor().trim());
+        book.setDescription(trimToNull(request.getDescription()));
     }
 
     private BookResponse toResponse(Book book) {

@@ -8,10 +8,10 @@ import com.lifetrack.common.exception.ApiException;
 import com.lifetrack.common.security.JwtService;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ApiException("Bu e-posta ile kayıtlı kullanıcı mevcut");
+            throw ApiException.conflict("Bu e-posta ile kayıtlı kullanıcı mevcut");
         }
 
         User user = new User();
@@ -47,34 +47,25 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepository.save(user);
-        UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-            .username(savedUser.getEmail())
-            .password(savedUser.getPassword())
-            .roles("USER")
-            .build();
-
-        String token = jwtService.generateToken(userDetails);
-
-        return new AuthResponse(token, new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail()));
+        return toAuthResponse(savedUser);
     }
 
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication;
         try {
-            authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
-        } catch (BadCredentialsException ex) {
-            throw new ApiException("Giriş bilgileri hatalı", ex);
-        }
-
-        if (!authentication.isAuthenticated()) {
-            throw new ApiException("Giriş bilgileri hatalı");
+        } catch (AuthenticationException ex) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Giriş bilgileri hatalı", ex);
         }
 
         User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new ApiException("Kullanıcı bulunamadı"));
+            .orElseThrow(() -> ApiException.unauthorized("Giriş bilgileri hatalı"));
 
+        return toAuthResponse(user);
+    }
+
+    private AuthResponse toAuthResponse(User user) {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
             .username(user.getEmail())
             .password(user.getPassword())

@@ -19,10 +19,10 @@ public class Media {
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
+    @Column(length = 2048)
     private String url;
 
-    @Column(nullable = false)
+    @Column(length = 2000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -19,7 +19,7 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-    @Column(nullable = false)
+    @Column(length = 2000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

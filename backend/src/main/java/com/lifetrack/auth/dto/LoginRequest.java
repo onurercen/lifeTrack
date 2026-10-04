@@ -1,5 +1,6 @@
 package com.lifetrack.auth.dto;
 
+import com.lifetrack.common.util.Strings;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -16,8 +17,9 @@ public class LoginRequest {
         return email;
     }
 
+    // Normalised on input so "Ayse@Test.com" and "ayse@test.com" are the same account.
     public void setEmail(String email) {
-        this.email = email;
+        this.email = Strings.normalizeEmail(email);
     }
 
     public String getPassword() {

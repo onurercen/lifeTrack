@@ -6,13 +6,14 @@ import jakarta.validation.constraints.Size;
 public class CreateBookRequest {
 
     @NotBlank(message = "Kitap başlığı zorunludur")
+    @Size(max = 255, message = "Başlık en fazla 255 karakter olabilir")
     private String title;
 
     @NotBlank(message = "Yazar adı zorunludur")
+    @Size(max = 255, message = "Yazar adı en fazla 255 karakter olabilir")
     private String author;
 
-    @NotBlank(message = "Açıklama zorunludur")
-    @Size(min = 3, message = "Açıklama en az 3 karakter olmalıdır")
+    @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
     private String description;
 
     public String getTitle() {

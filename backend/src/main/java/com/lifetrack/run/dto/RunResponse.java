@@ -10,18 +10,20 @@ public class RunResponse {
     private Integer caloriesBurned;
     private String notes;
     private String userEmail;
+    private LocalDateTime runAt;
     private LocalDateTime createdAt;
 
     public RunResponse() {
     }
 
-    public RunResponse(Long id, Double distanceKm, Integer durationMinutes, Integer caloriesBurned, String notes, String userEmail, LocalDateTime createdAt) {
+    public RunResponse(Long id, Double distanceKm, Integer durationMinutes, Integer caloriesBurned, String notes, String userEmail, LocalDateTime runAt, LocalDateTime createdAt) {
         this.id = id;
         this.distanceKm = distanceKm;
         this.durationMinutes = durationMinutes;
         this.caloriesBurned = caloriesBurned;
         this.notes = notes;
         this.userEmail = userEmail;
+        this.runAt = runAt;
         this.createdAt = createdAt;
     }
 
@@ -71,6 +73,14 @@ public class RunResponse {
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    public LocalDateTime getRunAt() {
+        return runAt;
+    }
+
+    public void setRunAt(LocalDateTime runAt) {
+        this.runAt = runAt;
     }
 
     public LocalDateTime getCreatedAt() {

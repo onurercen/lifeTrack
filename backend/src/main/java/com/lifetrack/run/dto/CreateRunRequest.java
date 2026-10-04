@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
+
 public class CreateRunRequest {
 
     @NotNull(message = "Mesafe zorunludur")
@@ -15,12 +17,22 @@ public class CreateRunRequest {
     @Min(value = 1, message = "Süre en az 1 dakika olmalıdır")
     private Integer durationMinutes;
 
-    @NotNull(message = "Kalori zorunludur")
     @Min(value = 1, message = "Kalori en az 1 olmalıdır")
     private Integer caloriesBurned;
 
     @Size(max = 500, message = "Not en fazla 500 karakter olabilir")
     private String notes;
+
+    /** Optional; defaults to now. */
+    private LocalDateTime runAt;
+
+    public LocalDateTime getRunAt() {
+        return runAt;
+    }
+
+    public void setRunAt(LocalDateTime runAt) {
+        this.runAt = runAt;
+    }
 
     public Double getDistanceKm() {
         return distanceKm;
