@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.lifetrack.auth.AuthControllerIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.856 s -- in com.lifetrack.auth.AuthControllerIntegrationTest
