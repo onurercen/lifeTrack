@@ -3,13 +3,40 @@ services:
     image: postgres:16
     container_name: lifetrack-postgres
     environment:
-      POSTGRES_DB: lifetrack
-      POSTGRES_USER: lifetrack
-      POSTGRES_PASSWORD: lifetrack
+      POSTGRES_DB: ${POSTGRES_DB:-lifetrack}
+      POSTGRES_USER: ${POSTGRES_USER:-lifetrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lifetrack}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional: start with `docker compose --profile app up -d --build`.
+  # Without the profile only PostgreSQL starts, for running the backend from the IDE.
+  backend:
+    profiles: ["app"]
+    build: ./backend
+    container_name: lifetrack-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-lifetrack}
+      DB_USERNAME: ${POSTGRES_USER:-lifetrack}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-lifetrack}
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      CORS_ALLOWED_ORIGIN_PATTERNS: ${CORS_ALLOWED_ORIGIN_PATTERNS:-http://localhost:*,http://127.0.0.1:*}
+      # Run times are local times without an offset, so the server must share the
+      # users' time zone; otherwise "now" from the phone is rejected as the future.
+      TZ: ${TZ:-Europe/Istanbul}
+    ports:
+      - "8080:8080"
 
 volumes:
   postgres_data:
