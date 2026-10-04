@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../app/app_scope.dart';
 import '../../../app/routes.dart';
-import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
-import '../../../core/storage/auth_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,8 +12,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _apiClient = ApiClient();
-  final _authStorage = AuthStorage();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -22,7 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _apiClient.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -33,13 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      final authResponse = await _apiClient.login(
+      await AppScope.read(context).auth.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      await _authStorage.saveToken(authResponse.token);
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      // AuthGate switches to the home screen once the session starts.
     } on ApiException catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));

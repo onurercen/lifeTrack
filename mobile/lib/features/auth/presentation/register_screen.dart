@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../app/routes.dart';
-import '../../../core/network/api_client.dart';
+import '../../../app/app_scope.dart';
 import '../../../core/network/api_exception.dart';
-import '../../../core/storage/auth_storage.dart';
 
 class RegisterScreen extends StatefulWidget {
 	const RegisterScreen({super.key});
@@ -13,8 +11,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
 	final _formKey = GlobalKey<FormState>();
-	final _apiClient = ApiClient();
-	final _authStorage = AuthStorage();
 	final _nameController = TextEditingController();
 	final _emailController = TextEditingController();
 	final _passwordController = TextEditingController();
@@ -25,7 +21,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 	@override
 	void dispose() {
-		_apiClient.dispose();
 		_nameController.dispose();
 		_emailController.dispose();
 		_passwordController.dispose();
@@ -38,14 +33,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 		setState(() => _isSubmitting = true);
 		try {
-			final authResponse = await _apiClient.register(
+			await AppScope.read(context).auth.register(
 				name: _nameController.text.trim(),
 				email: _emailController.text.trim(),
 				password: _passwordController.text,
 			);
-			await _authStorage.saveToken(authResponse.token);
-			if (!mounted) return;
-			Navigator.pushReplacementNamed(context, AppRoutes.home);
+			// AuthGate switches to the home screen once the session starts.
 		} on ApiException catch (error) {
 			if (!mounted) return;
 			ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
@@ -140,7 +133,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 										),
 										const SizedBox(height: 12),
 										TextButton(
-											onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.login),
+											onPressed: () => Navigator.pop(context),
 											child: const Text('Zaten hesabın var mı? Giriş yap'),
 										),
 									],

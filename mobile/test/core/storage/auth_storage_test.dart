@@ -2,7 +2,7 @@ import 'package:flutter_secure_storage/test/test_flutter_secure_storage_platform
 import 'package:flutter_secure_storage_platform_interface/flutter_secure_storage_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../lib/core/storage/auth_storage.dart';
+import 'package:lifetrack_mobile/core/storage/auth_storage.dart';
 
 void main() {
   test('JWT yeni storage örneğinden okunabilir ve silinebilir', () async {

@@ -1,6 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class AppLogger {
-  static void info(String message) {
-    // TODO: add logging
-    print('[INFO] $message');
-  }
+  static void info(String message) => debugPrint('[INFO] $message');
 }

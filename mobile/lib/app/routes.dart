@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
-import '../features/home/presentation/home_screen.dart';
 
+/// Root screens (splash / login / home) are chosen by the auth state in
+/// `app.dart`; only screens pushed on top of them are listed here.
 class AppRoutes {
-  static const String login = '/login';
   static const String register = '/register';
-  static const String home = '/home';
 
   static Map<String, WidgetBuilder> get routes => {
-        login: (context) => const LoginScreen(),
         register: (context) => const RegisterScreen(),
-        home: (context) => const HomeScreen(),
       };
 }

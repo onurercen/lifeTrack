@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/app_scope.dart';
+import '../../../core/widgets/entity_list_screen.dart';
+import '../data/media_repository.dart';
+import '../models/media.dart';
+import 'media_form_screen.dart';
+
 class MediaScreen extends StatelessWidget {
   const MediaScreen({super.key});
 
+  static IconData iconFor(String type) => switch (type.toLowerCase()) {
+        'film' || 'movie' => Icons.movie_outlined,
+        'dizi' || 'series' => Icons.live_tv_outlined,
+        'belgesel' => Icons.public,
+        'podcast' => Icons.podcasts,
+        'video' => Icons.smart_display_outlined,
+        _ => Icons.play_circle_outline,
+      };
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Medya')),
-      body: const Center(child: Text('Medya ekranı')),
+    final repository = MediaRepository(AppScope.read(context).api);
+    return EntityListScreen<Media>(
+      title: 'Medya',
+      addLabel: 'Medya ekle',
+      emptyIcon: Icons.movie,
+      emptyText: 'Henüz medya eklemedin.\nİzlediğin film, dizi ya da dinlediğin podcastleri ekle.',
+      searchHint: 'Başlık, tür veya açıklamada ara',
+      load: (query) => repository.fetchMedia(query: query),
+      delete: (media) => repository.deleteMedia(media.id),
+      idOf: (media) => media.id,
+      deletePrompt: (media) => '"${media.title}" silinsin mi?',
+      itemBuilder: (context, media, onTap) => ListTile(
+        onTap: onTap,
+        leading: CircleAvatar(child: Icon(iconFor(media.type))),
+        title: Text(media.title),
+        subtitle: Text(
+          [media.type, if (media.description != null) media.description!].join('\n'),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        isThreeLine: media.description != null,
+      ),
+      formBuilder: (media) => MediaFormScreen(repository: repository, media: media),
     );
   }
 }
