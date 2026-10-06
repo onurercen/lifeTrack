@@ -48,7 +48,8 @@ class DatabaseMigrationTest {
             .map(MigrationInfo::getScript)
             .toList();
         assertThat(applied).contains(
-            "V1__initial_schema.sql", "V2__run_date_and_optional_fields.sql", "V3__lowercase_emails.sql");
+            "V1__initial_schema.sql", "V2__run_date_and_optional_fields.sql", "V3__lowercase_emails.sql",
+            "V4__book_and_media_progress.sql");
 
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         assertThat(isNullable(jdbc, "runs", "calories_burned")).isTrue();
@@ -97,6 +98,29 @@ class DatabaseMigrationTest {
 
         List<String> emails = jdbc.queryForList("select email from users order by id", String.class);
         assertThat(emails).containsExactly("mixed@case.com", "Dup@Test.com", "dup@test.com");
+    }
+
+    @Test
+    void legacyDatabase_shouldGiveExistingBooksAndMediaAStatus() throws Exception {
+        DataSource dataSource = newDatabase("progress");
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        jdbc.execute(readMigration("V1__initial_schema.sql"));
+        jdbc.update("insert into users (name, email, password, created_at) values ('A', 'a@test.com', 'x', now())");
+        jdbc.update("""
+            insert into books (title, author, description, user_id, created_at)
+            values ('Dune', 'Frank Herbert', 'x', (select id from users), now())
+            """);
+        jdbc.update("""
+            insert into media (title, type, url, description, user_id, created_at)
+            values ('Interstellar', 'Film', 'https://e.com', 'x', (select id from users), now())
+            """);
+
+        flyway(dataSource).migrate();
+
+        assertThat(jdbc.queryForObject("select status from books", String.class)).isEqualTo("WANT_TO_READ");
+        assertThat(jdbc.queryForObject("select status from media", String.class)).isEqualTo("COMPLETED");
+        assertThat(isNullable(jdbc, "books", "page_count")).isTrue();
+        assertThat(isNullable(jdbc, "media", "finished_on")).isTrue();
     }
 
     private static Flyway flyway(DataSource dataSource) {

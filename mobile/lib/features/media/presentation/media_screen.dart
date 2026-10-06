@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app/app_scope.dart';
 import '../../../core/widgets/entity_list_screen.dart';
+import '../../../core/widgets/form_fields.dart';
 import '../data/media_repository.dart';
 import '../models/media.dart';
 import 'media_form_screen.dart';
@@ -27,7 +28,14 @@ class MediaScreen extends StatelessWidget {
       emptyIcon: Icons.movie,
       emptyText: 'Henüz medya eklemedin.\nİzlediğin film, dizi ya da dinlediğin podcastleri ekle.',
       searchHint: 'Başlık, tür veya açıklamada ara',
-      load: (query) => repository.fetchMedia(query: query),
+      filters: [
+        const ListFilter('Tümü', null),
+        for (final status in MediaStatus.values) ListFilter(status.label, status.apiValue),
+      ],
+      load: (query, filter) => repository.fetchMedia(
+        query: query,
+        status: filter == null ? null : MediaStatus.fromApi(filter),
+      ),
       delete: (media) => repository.deleteMedia(media.id),
       idOf: (media) => media.id,
       deletePrompt: (media) => '"${media.title}" silinsin mi?',
@@ -36,7 +44,10 @@ class MediaScreen extends StatelessWidget {
         leading: CircleAvatar(child: Icon(iconFor(media.type))),
         title: Text(media.title),
         subtitle: Text(
-          [media.type, if (media.description != null) media.description!].join('\n'),
+          [
+            [media.type, media.status.label, if (media.rating != null) formatStars(media.rating!)].join(' · '),
+            if (media.description != null) media.description!,
+          ].join('\n'),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),

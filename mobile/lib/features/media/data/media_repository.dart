@@ -6,8 +6,12 @@ class MediaRepository {
 
   final ApiClient _api;
 
-  Future<List<Media>> fetchMedia({String? query}) async {
-    final json = await _api.get('media', query: query == null ? null : {'query': query}) as List<dynamic>;
+  Future<List<Media>> fetchMedia({String? query, MediaStatus? status}) async {
+    final params = {
+      if (query != null) 'query': query,
+      if (status != null) 'status': status.apiValue,
+    };
+    final json = await _api.get('media', query: params.isEmpty ? null : params) as List<dynamic>;
     return json.map((e) => Media.fromJson(e as Map<String, dynamic>)).toList();
   }
 

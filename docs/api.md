@@ -31,12 +31,17 @@ Token yoksa, geçersizse veya süresi dolmuşsa yanıt `401 Unauthorized` olur.
     "weekCount": 2, "weekDistanceKm": 8.0, "weekDurationMinutes": 50,
     "lastSevenDays": [{ "date": "2026-09-28", "distanceKm": 0.0 }, "... 7 gün, bugün en sonda"]
   },
-  "bookCount": 4,
-  "mediaCount": 2
+  "books": {
+    "totalCount": 4, "readingCount": 1, "finishedThisYear": 2,
+    "currentlyReading": [{ "id": 7, "title": "Dune", "author": "Frank Herbert", "currentPage": 120, "pageCount": 400 }]
+  },
+  "media": { "totalCount": 2, "inProgressCount": 1, "completedThisYear": 1 }
 }
 ```
 
-"Hafta" bugün dahil son 7 gündür (takvim haftası değil).
+- "Hafta" bugün dahil son 7 gündür (takvim haftası değil).
+- `finishedThisYear` / `completedThisYear`: bitiş tarihi bu takvim yılında olan kayıtlar.
+- `currentlyReading` en fazla 5 kitap içerir (son başlananlar önce). Tamamı için `readingCount`.
 
 ## Koşu
 
@@ -64,25 +69,50 @@ Gövde:
 
 | Method | Path                    | Açıklama                                   |
 |--------|-------------------------|--------------------------------------------|
-| GET    | `/books?query=<metin>`  | Kullanıcının kitapları; `query` opsiyonel filtre (başlık, yazar, açıklama) |
+| GET    | `/books?query=<metin>&status=<durum>` | Kullanıcının kitapları; `query` (başlık, yazar, açıklama) ve `status` opsiyonel filtre |
 | POST   | `/books`                | Kitap ekler                                |
 | PUT    | `/books/{id}`           | Kitabı günceller                           |
 | DELETE | `/books/{id}`           | Kitabı siler, `204` döner                  |
 
-Gövde: `{ "title": "Dune", "author": "Frank Herbert", "description": "Bilim kurgu klasiği" }`
-(`description` opsiyonel, en fazla 2000 karakter)
+Gövde:
+
+```json
+{
+  "title": "Dune", "author": "Frank Herbert", "description": "Bilim kurgu klasiği",
+  "status": "READING", "pageCount": 400, "currentPage": 120, "rating": null,
+  "startedOn": "2026-09-20", "finishedOn": null
+}
+```
+
+- `title` ve `author` dışındaki tüm alanlar opsiyoneldir; `description` en fazla 2000 karakter.
+- `status`: `WANT_TO_READ` (okunacak), `READING` (okunuyor), `FINISHED` (bitti). Eklemede verilmezse
+  `WANT_TO_READ`, güncellemede verilmezse mevcut değer kullanılır.
+- `rating` 1–5, `pageCount` ≥ 1, `currentPage` ≥ 0 ve `pageCount`'u geçemez.
+- Tarihler (`startedOn`, `finishedOn`) `YYYY-MM-DD` biçimindedir, gelecekte olamaz, bitiş başlangıçtan önce olamaz.
+- Duruma göre sunucu şu kuralları uygular:
+  - `WANT_TO_READ`: tarihler ve `currentPage` temizlenir.
+  - `READING`: `finishedOn` temizlenir. Kitap bu duruma **yeni geçtiyse** ve `startedOn` boşsa bugün yazılır.
+  - `FINISHED`: kitap bu duruma yeni geçtiyse ve `finishedOn` boşsa bugün yazılır. `pageCount` varsa `currentPage = pageCount` olur.
+- Liste `createdAt`'e göre yeniden eskiye sıralanır.
 
 ## Medya
 
 | Method | Path                    | Açıklama                                   |
 |--------|-------------------------|--------------------------------------------|
-| GET    | `/media?query=<metin>`  | Kullanıcının medyası; `query` opsiyonel filtre (başlık, tür, açıklama) |
+| GET    | `/media?query=<metin>&status=<durum>` | Kullanıcının medyası; `query` (başlık, tür, açıklama) ve `status` opsiyonel filtre |
 | POST   | `/media`                | Medya ekler                                |
 | PUT    | `/media/{id}`           | Medyayı günceller                          |
 | DELETE | `/media/{id}`           | Medyayı siler, `204` döner                 |
 
 Gövde: `{ "title": "Interstellar", "type": "Film", "url": "https://...", "description": "Uzay yolculuğu" }`
 (`url` ve `description` opsiyonel; `url` verilirse geçerli bir bağlantı olmalı)
+
+Ek opsiyonel alanlar: `"status": "COMPLETED", "rating": 4, "finishedOn": "2026-10-01"`
+
+- `status`: `PLANNED` (izlenecek), `IN_PROGRESS` (izleniyor), `COMPLETED` (izlendi). Eklemede verilmezse
+  `PLANNED`, güncellemede verilmezse mevcut değer kullanılır.
+- `rating` 1–5. `finishedOn` yalnızca `COMPLETED` için saklanır, diğer durumlarda temizlenir.
+  Kayıt `COMPLETED` durumuna yeni geçtiyse ve tarih boşsa bugün yazılır. Gelecek bir tarih `400` döner.
 
 Kitap ve medyada da başka kullanıcıya ait id için `404` döner.
 
@@ -105,7 +135,7 @@ Doğrulama hatalarında alan bazlı mesajlar `errors` altında gelir:
 
 | Kod | Ne zaman                                   |
 |-----|--------------------------------------------|
-| 400 | Doğrulama hatası veya okunamayan istek gövdesi |
+| 400 | Doğrulama hatası, okunamayan istek gövdesi veya geçersiz `status` değeri |
 | 401 | Token yok/geçersiz, ya da hatalı giriş bilgileri |
 | 404 | Kaynak bulunamadı                          |
 | 409 | E-posta zaten kayıtlı                      |

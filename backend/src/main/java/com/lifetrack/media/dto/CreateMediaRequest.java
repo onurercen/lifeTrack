@@ -1,9 +1,14 @@
 package com.lifetrack.media.dto;
 
 import com.lifetrack.common.util.Strings;
+import com.lifetrack.media.entity.MediaStatus;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
+
+import java.time.LocalDate;
 
 public class CreateMediaRequest {
 
@@ -21,6 +26,15 @@ public class CreateMediaRequest {
 
     @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
     private String description;
+
+    // Omitted: PLANNED on create, unchanged on update.
+    private MediaStatus status;
+
+    @Min(value = 1, message = "Puan 1 ile 5 arasında olmalıdır")
+    @Max(value = 5, message = "Puan 1 ile 5 arasında olmalıdır")
+    private Integer rating;
+
+    private LocalDate finishedOn;
 
     public String getTitle() {
         return title;
@@ -53,5 +67,29 @@ public class CreateMediaRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public MediaStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MediaStatus status) {
+        this.status = status;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public LocalDate getFinishedOn() {
+        return finishedOn;
+    }
+
+    public void setFinishedOn(LocalDate finishedOn) {
+        this.finishedOn = finishedOn;
     }
 }

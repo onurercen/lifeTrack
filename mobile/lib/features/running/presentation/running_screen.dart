@@ -18,7 +18,7 @@ class RunningScreen extends StatelessWidget {
       addLabel: 'Koşu ekle',
       emptyIcon: Icons.directions_run,
       emptyText: 'Henüz koşu eklemedin.\nİlk koşunu eklemek için aşağıdaki butona dokun.',
-      load: (_) => repository.fetchRuns(),
+      load: (_, __) => repository.fetchRuns(),
       delete: (run) => repository.deleteRun(run.id),
       idOf: (run) => run.id,
       deletePrompt: (run) => '${formatDecimal(run.distanceKm)} km koşu silinsin mi?',

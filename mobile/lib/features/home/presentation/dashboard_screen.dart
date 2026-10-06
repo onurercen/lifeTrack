@@ -79,14 +79,28 @@ class DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _CountCard(icon: Icons.menu_book, label: 'Kitap', value: '${summary.bookCount}'),
+                    child: _CountCard(
+                      icon: Icons.menu_book,
+                      label: 'Kitap',
+                      value: '${summary.books.totalCount}',
+                      detail: '${summary.books.finishedThisYear} bu yıl bitti',
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _CountCard(icon: Icons.movie, label: 'Medya', value: '${summary.mediaCount}'),
+                    child: _CountCard(
+                      icon: Icons.movie,
+                      label: 'Medya',
+                      value: '${summary.media.totalCount}',
+                      detail: '${summary.media.completedThisYear} bu yıl izlendi',
+                    ),
                   ),
                 ],
               ),
+              if (summary.books.currentlyReading.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _ReadingCard(stats: summary.books),
+              ],
             ],
           ],
         ),
@@ -173,6 +187,51 @@ class WeeklyDistanceChart extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _ReadingCard extends StatelessWidget {
+  const _ReadingCard({required this.stats});
+
+  final BookStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hidden = stats.readingCount - stats.currentlyReading.length;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Şu an okuyorum', style: theme.textTheme.titleMedium),
+            for (final book in stats.currentlyReading) ...[
+              const SizedBox(height: 12),
+              Text(book.title, style: theme.textTheme.bodyLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+              Text(
+                [
+                  book.author,
+                  if (book.currentPage != null && book.pageCount != null) '${book.currentPage}/${book.pageCount} sayfa',
+                ].join(' · '),
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              if (book.progress != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: LinearProgressIndicator(value: book.progress, borderRadius: BorderRadius.circular(2)),
+                ),
+            ],
+            if (hidden > 0) ...[
+              const SizedBox(height: 12),
+              Text('+$hidden kitap daha', style: theme.textTheme.bodySmall),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

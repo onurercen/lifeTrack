@@ -5,8 +5,8 @@ import java.util.List;
 
 public record DashboardResponse(
     RunStats runs,
-    long bookCount,
-    long mediaCount
+    BookStats books,
+    MediaStats media
 ) {
 
     public record RunStats(
@@ -20,5 +20,19 @@ public record DashboardResponse(
     }
 
     public record DailyDistance(LocalDate date, double distanceKm) {
+    }
+
+    public record BookStats(
+        long totalCount,
+        long readingCount,
+        long finishedThisYear,
+        List<ReadingBook> currentlyReading
+    ) {
+    }
+
+    public record ReadingBook(Long id, String title, String author, Integer currentPage, Integer pageCount) {
+    }
+
+    public record MediaStats(long totalCount, long inProgressCount, long completedThisYear) {
     }
 }

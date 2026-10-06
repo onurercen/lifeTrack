@@ -3,6 +3,7 @@ package com.lifetrack.book.controller;
 import com.lifetrack.book.dto.BookResponse;
 import com.lifetrack.book.dto.CreateBookRequest;
 import com.lifetrack.book.service.BookService;
+import com.lifetrack.book.entity.BookStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,10 @@ public class BookController {
     @GetMapping
     public ResponseEntity<List<BookResponse>> getBooks(
         @RequestParam(required = false) String query,
+        @RequestParam(required = false) BookStatus status,
         @AuthenticationPrincipal UserDetails principal
     ) {
-        return ResponseEntity.ok(bookService.searchBooks(query, principal.getUsername()));
+        return ResponseEntity.ok(bookService.searchBooks(query, status, principal.getUsername()));
     }
 
     @PostMapping

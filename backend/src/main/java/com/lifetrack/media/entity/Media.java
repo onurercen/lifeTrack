@@ -3,6 +3,7 @@ package com.lifetrack.media.entity;
 import com.lifetrack.user.entity.User;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,14 @@ public class Media {
 
     @Column(length = 2000)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private MediaStatus status = MediaStatus.PLANNED;
+
+    private Integer rating;
+
+    private LocalDate finishedOn;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -78,6 +87,30 @@ public class Media {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public MediaStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MediaStatus status) {
+        this.status = status;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public LocalDate getFinishedOn() {
+        return finishedOn;
+    }
+
+    public void setFinishedOn(LocalDate finishedOn) {
+        this.finishedOn = finishedOn;
     }
 
     public User getUser() {

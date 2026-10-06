@@ -1,9 +1,14 @@
 package com.lifetrack.dashboard.service;
 
+import com.lifetrack.book.entity.BookStatus;
 import com.lifetrack.book.repository.BookRepository;
 import com.lifetrack.dashboard.dto.DashboardResponse;
+import com.lifetrack.dashboard.dto.DashboardResponse.BookStats;
 import com.lifetrack.dashboard.dto.DashboardResponse.DailyDistance;
+import com.lifetrack.dashboard.dto.DashboardResponse.MediaStats;
+import com.lifetrack.dashboard.dto.DashboardResponse.ReadingBook;
 import com.lifetrack.dashboard.dto.DashboardResponse.RunStats;
+import com.lifetrack.media.entity.MediaStatus;
 import com.lifetrack.media.repository.MediaRepository;
 import com.lifetrack.run.entity.Run;
 import com.lifetrack.run.repository.RunRepository;
@@ -40,9 +45,39 @@ public class DashboardService {
     public DashboardResponse getDashboard(String email) {
         return new DashboardResponse(
             runStats(email),
-            bookRepository.countByUserEmail(email),
-            mediaRepository.countByUserEmail(email)
+            bookStats(email),
+            mediaStats(email)
         );
+    }
+
+    private BookStats bookStats(String email) {
+        List<ReadingBook> currentlyReading = bookRepository
+            .findTop5ByUserEmailAndStatusOrderByStartedOnDescIdDesc(email, BookStatus.READING)
+            .stream()
+            .map(book -> new ReadingBook(
+                book.getId(), book.getTitle(), book.getAuthor(), book.getCurrentPage(), book.getPageCount()))
+            .toList();
+
+        return new BookStats(
+            bookRepository.countByUserEmail(email),
+            bookRepository.countByUserEmailAndStatus(email, BookStatus.READING),
+            bookRepository.countByUserEmailAndStatusAndFinishedOnGreaterThanEqual(
+                email, BookStatus.FINISHED, startOfYear()),
+            currentlyReading
+        );
+    }
+
+    private MediaStats mediaStats(String email) {
+        return new MediaStats(
+            mediaRepository.countByUserEmail(email),
+            mediaRepository.countByUserEmailAndStatus(email, MediaStatus.IN_PROGRESS),
+            mediaRepository.countByUserEmailAndStatusAndFinishedOnGreaterThanEqual(
+                email, MediaStatus.COMPLETED, startOfYear())
+        );
+    }
+
+    private LocalDate startOfYear() {
+        return LocalDate.now(clock).withDayOfYear(1);
     }
 
     // "Week" is a rolling window: today and the six days before it.

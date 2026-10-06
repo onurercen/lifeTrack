@@ -3,6 +3,7 @@ package com.lifetrack.media.controller;
 import com.lifetrack.media.dto.CreateMediaRequest;
 import com.lifetrack.media.dto.MediaResponse;
 import com.lifetrack.media.service.MediaService;
+import com.lifetrack.media.entity.MediaStatus;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,10 @@ public class MediaController {
     @GetMapping
     public ResponseEntity<List<MediaResponse>> getMedia(
         @RequestParam(required = false) String query,
+        @RequestParam(required = false) MediaStatus status,
         @AuthenticationPrincipal UserDetails principal
     ) {
-        return ResponseEntity.ok(mediaService.searchMedia(query, principal.getUsername()));
+        return ResponseEntity.ok(mediaService.searchMedia(query, status, principal.getUsername()));
     }
 
     @PostMapping

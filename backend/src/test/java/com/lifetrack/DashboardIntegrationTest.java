@@ -1,7 +1,10 @@
 package com.lifetrack;
 
 import com.lifetrack.book.entity.Book;
+import com.lifetrack.book.entity.BookStatus;
 import com.lifetrack.book.repository.BookRepository;
+import com.lifetrack.media.entity.Media;
+import com.lifetrack.media.entity.MediaStatus;
 import com.lifetrack.media.repository.MediaRepository;
 import com.lifetrack.run.entity.Run;
 import com.lifetrack.run.repository.RunRepository;
@@ -61,8 +64,9 @@ class DashboardIntegrationTest {
             .andExpect(jsonPath("$.runs.totalCount").value(0))
             .andExpect(jsonPath("$.runs.totalDistanceKm").value(0.0))
             .andExpect(jsonPath("$.runs.lastSevenDays.length()").value(7))
-            .andExpect(jsonPath("$.bookCount").value(0))
-            .andExpect(jsonPath("$.mediaCount").value(0));
+            .andExpect(jsonPath("$.books.totalCount").value(0))
+            .andExpect(jsonPath("$.books.currentlyReading.length()").value(0))
+            .andExpect(jsonPath("$.media.totalCount").value(0));
     }
 
     @Test
@@ -87,8 +91,35 @@ class DashboardIntegrationTest {
             .andExpect(jsonPath("$.runs.lastSevenDays[6].date").value(LocalDate.now().toString()))
             .andExpect(jsonPath("$.runs.lastSevenDays[6].distanceKm").value(5.0))
             .andExpect(jsonPath("$.runs.lastSevenDays[4].distanceKm").value(3.0))
-            .andExpect(jsonPath("$.bookCount").value(1))
-            .andExpect(jsonPath("$.mediaCount").value(0));
+            .andExpect(jsonPath("$.books.totalCount").value(1))
+            .andExpect(jsonPath("$.media.totalCount").value(0));
+    }
+
+    @Test
+    void dashboard_shouldSummariseReadingAndWatching() throws Exception {
+        LocalDate today = LocalDate.now();
+        saveBook(currentUser, "Dune", BookStatus.READING, today.minusDays(3), null);
+        saveBook(currentUser, "Bitti", BookStatus.FINISHED, null, today);
+        saveBook(currentUser, "Geçen yıl", BookStatus.FINISHED, null, today.withDayOfYear(1).minusDays(1));
+        saveBook(currentUser, "Listede", BookStatus.WANT_TO_READ, null, null);
+        saveMedia(currentUser, MediaStatus.COMPLETED, today);
+        saveMedia(currentUser, MediaStatus.IN_PROGRESS, null);
+
+        User other = userRepository.save(new User("Other", "other@example.com", "secret123"));
+        saveBook(other, "Başkası", BookStatus.READING, today, null);
+
+        mockMvc.perform(get("/api/dashboard").with(user("test@example.com")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.books.totalCount").value(4))
+            .andExpect(jsonPath("$.books.readingCount").value(1))
+            .andExpect(jsonPath("$.books.finishedThisYear").value(1))
+            .andExpect(jsonPath("$.books.currentlyReading.length()").value(1))
+            .andExpect(jsonPath("$.books.currentlyReading[0].title").value("Dune"))
+            .andExpect(jsonPath("$.books.currentlyReading[0].currentPage").value(120))
+            .andExpect(jsonPath("$.books.currentlyReading[0].pageCount").value(400))
+            .andExpect(jsonPath("$.media.totalCount").value(2))
+            .andExpect(jsonPath("$.media.inProgressCount").value(1))
+            .andExpect(jsonPath("$.media.completedThisYear").value(1));
     }
 
     @Test
@@ -108,11 +139,30 @@ class DashboardIntegrationTest {
     }
 
     private void saveBook(User owner) {
+        saveBook(owner, "Kitap", BookStatus.WANT_TO_READ, null, null);
+    }
+
+    private void saveBook(User owner, String title, BookStatus status, LocalDate startedOn, LocalDate finishedOn) {
         Book book = new Book();
-        book.setTitle("Kitap");
+        book.setTitle(title);
         book.setAuthor("Yazar");
         book.setDescription("Açıklama");
+        book.setStatus(status);
+        book.setPageCount(400);
+        book.setCurrentPage(status == BookStatus.READING ? 120 : null);
+        book.setStartedOn(startedOn);
+        book.setFinishedOn(finishedOn);
         book.setUser(owner);
         bookRepository.save(book);
+    }
+
+    private void saveMedia(User owner, MediaStatus status, LocalDate finishedOn) {
+        Media media = new Media();
+        media.setTitle("Medya");
+        media.setType("Film");
+        media.setStatus(status);
+        media.setFinishedOn(finishedOn);
+        media.setUser(owner);
+        mediaRepository.save(media);
     }
 }

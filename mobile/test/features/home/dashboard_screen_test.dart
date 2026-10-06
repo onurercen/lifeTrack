@@ -7,7 +7,12 @@ import 'package:lifetrack_mobile/features/home/presentation/dashboard_screen.dar
 
 import '../../test_helpers.dart';
 
-Map<String, dynamic> _summaryJson({double weekKm = 8, int weekCount = 2}) => {
+Map<String, dynamic> _summaryJson({
+  double weekKm = 8,
+  int weekCount = 2,
+  List<Map<String, dynamic>> reading = const [],
+}) =>
+    {
       'runs': {
         'totalCount': 3,
         'totalDistanceKm': 18.0,
@@ -21,8 +26,8 @@ Map<String, dynamic> _summaryJson({double weekKm = 8, int weekCount = 2}) => {
             {'date': date, 'distanceKm': i == 6 ? 5.0 : (i == 4 ? 3.0 : 0.0)},
         ],
       },
-      'bookCount': 4,
-      'mediaCount': 2,
+      'books': {'totalCount': 4, 'readingCount': reading.length, 'finishedThisYear': 1, 'currentlyReading': reading},
+      'media': {'totalCount': 2, 'inProgressCount': 0, 'completedThisYear': 2},
     };
 
 Future<void> _pump(WidgetTester tester, http.Client client) async {
@@ -42,6 +47,9 @@ void main() {
     expect(find.text('18 km'), findsOneWidget); // toplam
     expect(find.text('4'), findsOneWidget); // kitap
     expect(find.text('2'), findsOneWidget); // medya
+    expect(find.text('1 bu yıl bitti'), findsOneWidget);
+    expect(find.text('2 bu yıl izlendi'), findsOneWidget);
+    expect(find.text('Şu an okuyorum'), findsNothing);
     expect(find.byType(WeeklyDistanceChart), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp(r'5 km$')), findsOneWidget);
   });
@@ -68,5 +76,24 @@ void main() {
     await tester.tap(find.text('Tekrar dene'));
     await tester.pumpAndSettle();
     expect(find.text('8 km'), findsOneWidget);
+  });
+
+  testWidgets('okunmakta olan kitapları ilerlemesiyle gösterir', (tester) async {
+    await _pump(
+      tester,
+      mockBackend({
+        'GET /api/dashboard': (_) => jsonResponse(_summaryJson(reading: [
+              {'id': 1, 'title': 'Dune', 'author': 'Frank Herbert', 'currentPage': 100, 'pageCount': 400},
+              {'id': 2, 'title': 'Sayfasız', 'author': 'Yazar', 'currentPage': null, 'pageCount': null},
+            ])),
+      }),
+    );
+
+    await tester.scrollUntilVisible(find.text('Sayfasız'), 100);
+    expect(find.text('Şu an okuyorum'), findsOneWidget);
+    expect(find.text('Frank Herbert · 100/400 sayfa'), findsOneWidget);
+    expect(find.text('Yazar'), findsOneWidget);
+    final bar = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    expect(bar.value, 0.25);
   });
 }

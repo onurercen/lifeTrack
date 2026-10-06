@@ -4,8 +4,16 @@ import 'package:flutter/material.dart';
 
 import '../network/api_exception.dart';
 
+/// A filter chip on [EntityListScreen]; a null [value] means "everything".
+class ListFilter {
+  const ListFilter(this.label, this.value);
+
+  final String label;
+  final String? value;
+}
+
 /// Shared list screen for a user's records: loading / error / empty states,
-/// pull-to-refresh, optional search, swipe-to-delete and an add/edit form.
+/// pull-to-refresh, optional search and filter chips, swipe-to-delete and an add/edit form.
 class EntityListScreen<T> extends StatefulWidget {
   const EntityListScreen({
     super.key,
@@ -21,6 +29,7 @@ class EntityListScreen<T> extends StatefulWidget {
     required this.formBuilder,
     this.headerBuilder,
     this.searchHint,
+    this.filters,
   });
 
   final String title;
@@ -28,8 +37,9 @@ class EntityListScreen<T> extends StatefulWidget {
   final IconData emptyIcon;
   final String emptyText;
 
-  /// Loads records; [query] is null when search is off or empty.
-  final Future<List<T>> Function(String? query) load;
+  /// Loads records; [query] is null when search is off or empty, [filter] is
+  /// the selected [ListFilter.value].
+  final Future<List<T>> Function(String? query, String? filter) load;
   final Future<void> Function(T item) delete;
   final Object Function(T item) idOf;
   final String Function(T item) deletePrompt;
@@ -42,6 +52,9 @@ class EntityListScreen<T> extends StatefulWidget {
   /// Enables the search field when non-null.
   final String? searchHint;
 
+  /// Shows a row of choice chips when non-null; the first one starts selected.
+  final List<ListFilter>? filters;
+
   @override
   State<EntityListScreen<T>> createState() => _EntityListScreenState<T>();
 }
@@ -51,6 +64,7 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
   Timer? _debounce;
   List<T>? _items;
   String? _error;
+  late String? _filter = widget.filters?.first.value;
   int _requestId = 0;
 
   String? get _query {
@@ -75,7 +89,7 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
     // Ignore responses that arrive after a newer search was started.
     final requestId = ++_requestId;
     try {
-      final items = await widget.load(_query);
+      final items = await widget.load(_query, _filter);
       if (!mounted || requestId != _requestId) return;
       setState(() {
         _items = items;
@@ -94,9 +108,7 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
   }
 
   Future<void> _openForm([T? item]) async {
-    final saved = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => widget.formBuilder(item)),
-    );
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => widget.formBuilder(item)));
     if (saved == true) await _load();
   }
 
@@ -125,39 +137,77 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
     }
   }
 
+  void _onFilterSelected(String? value) {
+    if (value == _filter) return;
+    setState(() {
+      _filter = value;
+      _items = null; // show the spinner instead of stale results
+      _error = null;
+    });
+    _load();
+  }
+
+  PreferredSizeWidget? _buildAppBarBottom() {
+    final filters = widget.filters;
+    if (widget.searchHint == null && filters == null) return null;
+    return PreferredSize(
+      preferredSize: Size.fromHeight((widget.searchHint == null ? 0 : 64) + (filters == null ? 0 : 52)),
+      child: Column(
+        children: [
+          if (widget.searchHint != null) _buildSearchBar(),
+          if (filters != null)
+            SizedBox(
+              height: 52,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                children: [
+                  for (final filter in filters)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(filter.label),
+                        selected: filter.value == _filter,
+                        onSelected: (_) => _onFilterSelected(filter.value),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      child: SearchBar(
+        controller: _searchController,
+        hintText: widget.searchHint,
+        leading: const Icon(Icons.search),
+        elevation: const WidgetStatePropertyAll(0),
+        onChanged: _onSearchChanged,
+        trailing: [
+          if (_searchController.text.isNotEmpty)
+            IconButton(
+              tooltip: 'Temizle',
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                _debounce?.cancel();
+                setState(_searchController.clear);
+                _load();
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        bottom: widget.searchHint == null
-            ? null
-            : PreferredSize(
-                preferredSize: const Size.fromHeight(64),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: SearchBar(
-                    controller: _searchController,
-                    hintText: widget.searchHint,
-                    leading: const Icon(Icons.search),
-                    elevation: const WidgetStatePropertyAll(0),
-                    onChanged: _onSearchChanged,
-                    trailing: [
-                      if (_searchController.text.isNotEmpty)
-                        IconButton(
-                          tooltip: 'Temizle',
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            _debounce?.cancel();
-                            setState(_searchController.clear);
-                            _load();
-                          },
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-      ),
+      appBar: AppBar(title: Text(widget.title), bottom: _buildAppBarBottom()),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
@@ -180,9 +230,9 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
       );
     }
     if (items.isEmpty) {
-      return _query != null
-          ? const _Message(icon: Icons.search_off, text: 'Aramanla eşleşen kayıt yok.')
-          : _Message(icon: widget.emptyIcon, text: widget.emptyText);
+      if (_query != null) return const _Message(icon: Icons.search_off, text: 'Aramanla eşleşen kayıt yok.');
+      if (_filter != null) return const _Message(icon: Icons.filter_alt_off, text: 'Bu filtrede kayıt yok.');
+      return _Message(icon: widget.emptyIcon, text: widget.emptyText);
     }
 
     final header = widget.headerBuilder;

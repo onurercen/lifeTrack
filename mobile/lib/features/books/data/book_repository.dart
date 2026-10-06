@@ -6,8 +6,12 @@ class BookRepository {
 
   final ApiClient _api;
 
-  Future<List<Book>> fetchBooks({String? query}) async {
-    final json = await _api.get('books', query: query == null ? null : {'query': query}) as List<dynamic>;
+  Future<List<Book>> fetchBooks({String? query, BookStatus? status}) async {
+    final params = {
+      if (query != null) 'query': query,
+      if (status != null) 'status': status.apiValue,
+    };
+    final json = await _api.get('books', query: params.isEmpty ? null : params) as List<dynamic>;
     return json.map((e) => Book.fromJson(e as Map<String, dynamic>)).toList();
   }
 

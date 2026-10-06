@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:lifetrack_mobile/app/app_scope.dart';
 import 'package:lifetrack_mobile/core/network/api_client.dart';
+import 'package:lifetrack_mobile/features/books/models/book.dart';
 import 'package:lifetrack_mobile/features/books/presentation/books_screen.dart';
 
 import '../../test_helpers.dart';
@@ -92,7 +93,17 @@ void main() {
     await tester.tap(find.text('Kaydet'));
     await tester.pumpAndSettle();
 
-    expect(sent, {'title': 'Dune Messiah', 'author': 'Frank Herbert', 'description': 'Açıklama'});
+    expect(sent, {
+      'title': 'Dune Messiah',
+      'author': 'Frank Herbert',
+      'description': 'Açıklama',
+      'status': 'WANT_TO_READ',
+      'pageCount': null,
+      'currentPage': null,
+      'rating': null,
+      'startedOn': null,
+      'finishedOn': null,
+    });
     expect(find.text('Dune Messiah'), findsOneWidget);
   });
 
@@ -142,7 +153,115 @@ void main() {
     await tester.tap(find.text('Ekle'));
     await tester.pumpAndSettle();
 
-    expect(sent, {'title': 'Dune', 'author': 'Frank Herbert', 'description': null});
+    expect(sent, {
+      'title': 'Dune',
+      'author': 'Frank Herbert',
+      'description': null,
+      'status': 'WANT_TO_READ',
+      'pageCount': null,
+      'currentPage': null,
+      'rating': null,
+      'startedOn': null,
+      'finishedOn': null,
+    });
     expect(find.text('Dune'), findsOneWidget);
+  });
+
+  testWidgets('durum filtresini backende iletir ve okuma ilerlemesini gösterir', (tester) async {
+    final statuses = <String?>[];
+    await _pump(
+      tester,
+      mockBackend({
+        'GET /api/books': (request) {
+          final status = request.url.queryParameters['status'];
+          statuses.add(status);
+          final all = [
+            {..._bookJson(1, 'Dune', 'Frank Herbert'), 'status': 'READING', 'pageCount': 400, 'currentPage': 120},
+            {..._bookJson(2, 'Clean Code', 'Robert C. Martin'), 'status': 'FINISHED', 'rating': 4},
+          ];
+          return jsonResponse(status == null ? all : all.where((b) => b['status'] == status).toList());
+        },
+      }),
+    );
+
+    expect(find.text('Okunuyor · 120/400 sayfa'), findsOneWidget);
+    expect(find.text('Bitti · ★★★★☆'), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Okunuyor'));
+    await tester.pumpAndSettle();
+
+    expect(statuses.last, 'READING');
+    expect(find.text('Dune'), findsOneWidget);
+    expect(find.text('Clean Code'), findsNothing);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Tümü'));
+    await tester.pumpAndSettle();
+    expect(statuses.last, isNull);
+  });
+
+  testWidgets('okunuyor durumunda sayfa ilerlemesini kaydeder ve doğrular', (tester) async {
+    Map<String, dynamic>? sent;
+    await _pump(
+      tester,
+      mockBackend({
+        'GET /api/books': (_) => jsonResponse([]),
+        'POST /api/books': (request) {
+          sent = jsonDecode(request.body) as Map<String, dynamic>;
+          return jsonResponse({..._bookJson(1, 'Dune', 'Frank Herbert'), ...sent!}, 201);
+        },
+      }),
+    );
+
+    await tester.tap(find.text('Kitap ekle'));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(TextFormField, 'Okunan sayfa (opsiyonel)'), findsNothing);
+
+    await tester.tap(find.descendant(of: find.byType(SegmentedButton<BookStatus>), matching: find.text('Okunuyor')));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextFormField, 'Başlık'), 'Dune');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Yazar'), 'Frank Herbert');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Sayfa sayısı (opsiyonel)'), '400');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Okunan sayfa (opsiyonel)'), '500');
+    expect(find.text('Bugün'), findsOneWidget); // server stamps the start date
+
+    await tapInForm(tester, find.text('Ekle'));
+    expect(find.text('Sayfa sayısından büyük olamaz'), findsOneWidget);
+    expect(sent, isNull);
+
+    await tester.enterText(find.widgetWithText(TextFormField, 'Okunan sayfa (opsiyonel)'), '120');
+    await tapInForm(tester, find.text('Ekle'));
+
+    expect(sent, containsPair('status', 'READING'));
+    expect(sent, containsPair('pageCount', 400));
+    expect(sent, containsPair('currentPage', 120));
+    expect(sent, containsPair('startedOn', null));
+  });
+
+  testWidgets('bitmiş kitaba puan verilebilir', (tester) async {
+    Map<String, dynamic>? sent;
+    await _pump(
+      tester,
+      mockBackend({
+        'GET /api/books': (_) => jsonResponse([
+              {..._bookJson(3, 'Dune', 'Frank Herbert'), 'status': 'FINISHED', 'finishedOn': '2026-09-01'},
+            ]),
+        'PUT /api/books/3': (request) {
+          sent = jsonDecode(request.body) as Map<String, dynamic>;
+          return jsonResponse({..._bookJson(3, 'Dune', 'Frank Herbert'), ...sent!});
+        },
+      }),
+    );
+
+    await tester.tap(find.text('Dune'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 Eyl 2026'), findsOneWidget);
+
+    await tapInForm(tester, find.byTooltip('4 yıldız'));
+    await tapInForm(tester, find.text('Kaydet'));
+
+    expect(sent, containsPair('rating', 4));
+    expect(sent, containsPair('finishedOn', '2026-09-01'));
+    expect(sent, containsPair('currentPage', null));
   });
 }

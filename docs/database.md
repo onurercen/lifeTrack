@@ -10,6 +10,7 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 | V1 | `V1__initial_schema.sql` | `users`, `runs`, `books`, `media` tabloları (Flyway öncesi Hibernate şemasıyla birebir) |
 | V2 | `V2__run_date_and_optional_fields.sql` | `runs.run_at`; kalori, kitap/medya açıklaması ve medya bağlantısı opsiyonel; açıklamalar 2000 karakter; liste indeksleri |
 | V3 | `V3__lowercase_emails.sql` | Kayıtlı e-postaları küçük harfe çevirir (API artık e-postayı küçük harfle kaydeder ve arar). Yalnızca büyük/küçük harf farkıyla çakışan hesaplara dokunmaz. |
+| V4 | `V4__book_and_media_progress.sql` | Kitaplara durum, sayfa, puan, başlama/bitiş tarihi; medyaya durum, puan, izlenme tarihi. Mevcut kitaplar `WANT_TO_READ`, mevcut medya `COMPLETED` olur. |
 
 ## Tablolar
 
@@ -18,9 +19,12 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 **runs**: `id`, `user_id`, `distance_km`, `duration_minutes`, `calories_burned` (null olabilir),
 `notes` (≤500), `run_at` (koşunun yapıldığı an), `created_at` (kaydın oluşturulduğu an)
 
-**books**: `id`, `user_id`, `title`, `author`, `description` (null olabilir, ≤2000), `created_at`
+**books**: `id`, `user_id`, `title`, `author`, `description` (null olabilir, ≤2000),
+`status` (`WANT_TO_READ` / `READING` / `FINISHED`), `page_count`, `current_page`, `rating` (1–5),
+`started_on`, `finished_on` (tarih), `created_at`
 
-**media**: `id`, `user_id`, `title`, `type`, `url` (null olabilir, ≤2048), `description` (null olabilir, ≤2000), `created_at`
+**media**: `id`, `user_id`, `title`, `type`, `url` (null olabilir, ≤2048), `description` (null olabilir, ≤2000),
+`status` (`PLANNED` / `IN_PROGRESS` / `COMPLETED`), `rating` (1–5), `finished_on` (tarih), `created_at`
 
 ## Flyway öncesi oluşturulmuş veritabanları
 

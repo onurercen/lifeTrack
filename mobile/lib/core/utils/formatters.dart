@@ -9,6 +9,13 @@ String formatLocalDateTimeForApi(DateTime value) {
       'T${_two(v.hour)}:${_two(v.minute)}:${_two(v.second)}';
 }
 
+/// e.g. "2026-10-04" — for LocalDate fields.
+String formatLocalDateForApi(DateTime value) =>
+    '${value.year.toString().padLeft(4, '0')}-${_two(value.month)}-${_two(value.day)}';
+
+/// e.g. "4 Eki 2026"
+String formatDate(DateTime value) => '${value.day} ${_months[value.month - 1]} ${value.year}';
+
 /// e.g. "4 Eki 2026, 07:30"
 String formatDateTime(DateTime value) {
   final local = value.toLocal();
