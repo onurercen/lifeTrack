@@ -209,6 +209,8 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title), bottom: _buildAppBarBottom()),
       floatingActionButton: FloatingActionButton.extended(
+        // The home shell keeps every tab alive, so default hero tags would clash on navigation.
+        heroTag: null,
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
         label: Text(widget.addLabel),
