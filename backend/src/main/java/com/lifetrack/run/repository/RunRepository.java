@@ -1,7 +1,9 @@
 package com.lifetrack.run.repository;
 
 import com.lifetrack.run.entity.Run;
+import com.lifetrack.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,4 +23,8 @@ public interface RunRepository extends JpaRepository<Run, Long> {
 
     @Query("select coalesce(sum(r.distanceKm), 0) from Run r where r.user.email = :email")
     double sumDistanceByUserEmail(@Param("email") String email);
+
+    @Modifying
+    @Query("delete from Run r where r.user = :user")
+    int deleteAllByOwner(@Param("user") User user);
 }

@@ -35,6 +35,14 @@ Yanıt (`register`, `login`, `refresh`):
 | Method | Path        | Açıklama                      |
 |--------|-------------|-------------------------------|
 | GET    | `/users/me` | Oturumdaki kullanıcının profili |
+| PUT    | `/users/me` | Adı günceller: `{ "name": "Ayşe Yılmaz" }` |
+| PUT    | `/users/me/password` | Şifreyi değiştirir: `{ "currentPassword": "...", "newPassword": "..." }` |
+| DELETE | `/users/me` | Hesabı ve tüm kayıtları siler: `{ "password": "..." }`, `204` döner |
+
+- Şifre değişince kullanıcının tüm refresh token'ları iptal edilir (diğer cihazlar en geç access token
+  süresi dolunca çıkış yapar) ve yanıt olarak çağıran cihaz için yeni bir token çifti döner (`/auth/login` yanıtı ile aynı).
+- Mevcut şifre yanlışsa `400` ve `errors.currentPassword` (silmede `errors.password`) döner.
+- E-posta değiştirme şimdilik desteklenmiyor.
 
 ## Özet (dashboard)
 
@@ -142,7 +150,7 @@ Tüm hatalar en az bir `message` alanı içerir:
 { "message": "Giriş bilgileri hatalı" }
 ```
 
-Doğrulama hatalarında alan bazlı mesajlar `errors` altında gelir:
+Doğrulama hatalarında (ve yanlış şifre gibi alana bağlı hatalarda) alan bazlı mesajlar `errors` altında gelir:
 
 ```json
 {

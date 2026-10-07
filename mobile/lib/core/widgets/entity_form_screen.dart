@@ -34,7 +34,8 @@ class _EntityFormScreenState extends State<EntityFormScreen> {
     setState(() => _isSubmitting = true);
     try {
       await widget.onSubmit();
-      if (mounted) Navigator.pop(context, true);
+      // Skip when the submit already navigated away (e.g. signing out after deleting the account).
+      if (mounted && (ModalRoute.of(context)?.isCurrent ?? false)) Navigator.pop(context, true);
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _serverErrors = e.fieldErrors);
@@ -85,6 +86,7 @@ class FormTextField extends StatelessWidget {
     this.keyboardType,
     this.hintText,
     this.validator,
+    this.obscureText = false,
   });
 
   final TextEditingController controller;
@@ -96,6 +98,7 @@ class FormTextField extends StatelessWidget {
   final int maxLines;
   final TextInputType? keyboardType;
   final String? hintText;
+  final bool obscureText;
 
   /// Extra check for non-empty input.
   final String? Function(String text)? validator;
@@ -104,7 +107,10 @@ class FormTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      maxLines: maxLines,
+      obscureText: obscureText,
+      autocorrect: !obscureText,
+      enableSuggestions: !obscureText,
+      maxLines: obscureText ? 1 : maxLines,
       maxLength: maxLength,
       keyboardType: keyboardType,
       textInputAction: maxLines > 1 ? TextInputAction.newline : TextInputAction.next,

@@ -86,6 +86,28 @@ class AuthController extends ChangeNotifier {
     await _clear();
   }
 
+  Future<void> updateName(String name) async {
+    final json = await _api.put('users/me', body: {'name': name});
+    _user = AuthUser.fromJson(json as Map<String, dynamic>);
+    notifyListeners();
+  }
+
+  /// Other devices are signed out; this one gets a new token pair.
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+    final json = await _api.put(
+      'users/me/password',
+      body: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
+    await _saveSession(AuthResponse.fromJson(json as Map<String, dynamic>));
+    notifyListeners();
+  }
+
+  /// Deletes the account and all its data on the server, then signs out.
+  Future<void> deleteAccount({required String password}) async {
+    await _api.delete('users/me', body: {'password': password});
+    await _clear();
+  }
+
   /// Called by [ApiClient] after a 401 to get a new token pair.
   Future<bool> refreshSession() async {
     final refreshToken = _refreshToken;

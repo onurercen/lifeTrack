@@ -2,7 +2,9 @@ package com.lifetrack.media.repository;
 
 import com.lifetrack.media.entity.Media;
 import com.lifetrack.media.entity.MediaStatus;
+import com.lifetrack.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,4 +33,8 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
         order by m.createdAt desc, m.id desc
         """)
     List<Media> search(@Param("email") String email, @Param("query") String query, @Param("status") MediaStatus status);
+
+    @Modifying
+    @Query("delete from Media m where m.user = :user")
+    int deleteAllByOwner(@Param("user") User user);
 }
