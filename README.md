@@ -76,12 +76,17 @@ Gerçek cihaz için:
 flutter run --dart-define=API_BASE_URL=http://<bilgisayar-ip>:8080/api
 ```
 
+## Yayına alma
+
+Prod ayarları, `docker-compose.prod.yml` (HTTPS, web uygulaması, günlük yedek) ve platform seçenekleri:
+[docs/deployment.md](docs/deployment.md)
+
 ## CI
 
 `.github/workflows/ci.yml` her push (main) ve pull request'te çalışır:
 
 - Backend: `mvn verify` ve Docker imajı derlemesi
-- Mobil: `flutter analyze` ve `flutter test`
+- Mobil: `flutter analyze`, `flutter test` ve web derlemesi
 
 ## Veritabanı
 

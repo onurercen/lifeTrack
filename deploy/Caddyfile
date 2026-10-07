@@ -1,0 +1,27 @@
+# Serves the Flutter web app and proxies /api to the backend on one origin.
+# DOMAIN is a real domain name (Caddy gets a Let's Encrypt certificate for it)
+# or "localhost" for a local test with Caddy's own certificate.
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# Only /api reaches the backend; /actuator stays internal.
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		root * /srv
+		# Always revalidate the entry points so a new release is picked up.
+		@entry path / /index.html /flutter_service_worker.js /flutter_bootstrap.js /manifest.json
+		header @entry Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}

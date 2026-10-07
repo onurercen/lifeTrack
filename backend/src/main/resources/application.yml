@@ -20,6 +20,19 @@ spring:
     baseline-version: 1
 server:
   port: ${SERVER_PORT:8080}
+  # Finish in-flight requests on shutdown (deploys, restarts).
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Only the health check, for load balancers and container platforms.
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
 
 cors:
   # Comma separated. Production: set CORS_ALLOWED_ORIGIN_PATTERNS to the real web origin(s).
