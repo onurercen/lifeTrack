@@ -2,27 +2,31 @@ package com.lifetrack.common.exception;
 
 import org.springframework.http.HttpStatus;
 
+import java.time.Duration;
 import java.util.Map;
 
 public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
     private final Map<String, String> fieldErrors;
+    private final Duration retryAfter;
 
     public ApiException(HttpStatus status, String message) {
-        this(status, message, Map.of());
+        this(status, message, Map.of(), null);
     }
 
     public ApiException(HttpStatus status, String message, Throwable cause) {
         super(message, cause);
         this.status = status;
         this.fieldErrors = Map.of();
+        this.retryAfter = null;
     }
 
-    private ApiException(HttpStatus status, String message, Map<String, String> fieldErrors) {
+    private ApiException(HttpStatus status, String message, Map<String, String> fieldErrors, Duration retryAfter) {
         super(message);
         this.status = status;
         this.fieldErrors = fieldErrors;
+        this.retryAfter = retryAfter;
     }
 
     public HttpStatus getStatus() {
@@ -34,9 +38,18 @@ public class ApiException extends RuntimeException {
         return fieldErrors;
     }
 
+    /** Sent as the Retry-After header when set. */
+    public Duration getRetryAfter() {
+        return retryAfter;
+    }
+
     /** A 400 for a single field, in the same shape as a bean validation error. */
     public static ApiException invalidField(String field, String message) {
-        return new ApiException(HttpStatus.BAD_REQUEST, message, Map.of(field, message));
+        return new ApiException(HttpStatus.BAD_REQUEST, message, Map.of(field, message), null);
+    }
+
+    public static ApiException tooManyRequests(String message, Duration retryAfter) {
+        return new ApiException(HttpStatus.TOO_MANY_REQUESTS, message, Map.of(), retryAfter);
     }
 
     public static ApiException badRequest(String message) {

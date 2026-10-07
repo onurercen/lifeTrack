@@ -5,9 +5,11 @@ import com.lifetrack.auth.dto.LoginRequest;
 import com.lifetrack.auth.dto.RegisterRequest;
 import com.lifetrack.auth.dto.UserResponse;
 import com.lifetrack.common.exception.ApiException;
+import com.lifetrack.common.security.FailedAttemptLimiter;
 import com.lifetrack.common.security.JwtService;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,19 +26,28 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final FailedAttemptLimiter attemptLimiter;
+    private final int maxFailuresPerAccount;
+    private final int maxFailuresPerIp;
 
     public AuthService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthenticationManager authenticationManager,
         JwtService jwtService,
-        RefreshTokenService refreshTokenService
+        RefreshTokenService refreshTokenService,
+        FailedAttemptLimiter attemptLimiter,
+        @Value("${security.failed-attempts.max-per-account:5}") int maxFailuresPerAccount,
+        @Value("${security.failed-attempts.max-per-ip:20}") int maxFailuresPerIp
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
+        this.attemptLimiter = attemptLimiter;
+        this.maxFailuresPerAccount = maxFailuresPerAccount;
+        this.maxFailuresPerIp = maxFailuresPerIp;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -53,14 +64,27 @@ public class AuthService {
         return toAuthResponse(savedUser);
     }
 
-    public AuthResponse login(LoginRequest request) {
+    /**
+     * Failed logins are limited per IP and e-mail pair (one account) and per IP
+     * (many accounts). Keying the account limit by IP too means nobody can lock
+     * someone else out just by knowing their e-mail address.
+     */
+    public AuthResponse login(LoginRequest request, String clientIp) {
+        String ipKey = "login-ip:" + clientIp;
+        String accountKey = "login-account:" + clientIp + "|" + request.getEmail();
+        attemptLimiter.check(ipKey, maxFailuresPerIp);
+        attemptLimiter.check(accountKey, maxFailuresPerAccount);
+
         try {
             authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
         } catch (AuthenticationException ex) {
+            attemptLimiter.recordFailure(ipKey);
+            attemptLimiter.recordFailure(accountKey);
             throw new ApiException(HttpStatus.UNAUTHORIZED, "Giriş bilgileri hatalı", ex);
         }
+        attemptLimiter.reset(accountKey);
 
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> ApiException.unauthorized("Giriş bilgileri hatalı"));

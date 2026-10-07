@@ -126,6 +126,7 @@ class ApiClient {
         401 => 'Oturumunuzun süresi doldu, lütfen tekrar giriş yapın.',
         403 => 'Bu işlem için yetkiniz yok.',
         404 => 'Kaynak bulunamadı.',
+        429 => 'Çok fazla deneme yapıldı, lütfen biraz sonra tekrar deneyin.',
         >= 500 => 'Sunucu hatası, lütfen daha sonra tekrar deneyin.',
         _ => 'İstek başarısız oldu.',
       };

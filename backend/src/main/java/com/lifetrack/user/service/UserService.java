@@ -6,12 +6,14 @@ import com.lifetrack.auth.service.AuthService;
 import com.lifetrack.auth.service.RefreshTokenService;
 import com.lifetrack.book.repository.BookRepository;
 import com.lifetrack.common.exception.ApiException;
+import com.lifetrack.common.security.FailedAttemptLimiter;
 import com.lifetrack.media.repository.MediaRepository;
 import com.lifetrack.run.repository.RunRepository;
 import com.lifetrack.user.dto.ChangePasswordRequest;
 import com.lifetrack.user.dto.UpdateProfileRequest;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
     private final AuthService authService;
+    private final FailedAttemptLimiter attemptLimiter;
+    private final int maxFailures;
 
     public UserService(
         UserRepository userRepository,
@@ -34,7 +38,9 @@ public class UserService {
         MediaRepository mediaRepository,
         PasswordEncoder passwordEncoder,
         RefreshTokenService refreshTokenService,
-        AuthService authService
+        AuthService authService,
+        FailedAttemptLimiter attemptLimiter,
+        @Value("${security.failed-attempts.max-per-account:5}") int maxFailures
     ) {
         this.userRepository = userRepository;
         this.runRepository = runRepository;
@@ -43,6 +49,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenService = refreshTokenService;
         this.authService = authService;
+        this.attemptLimiter = attemptLimiter;
+        this.maxFailures = maxFailures;
     }
 
     public UserResponse getCurrentUser(String email) {
@@ -80,10 +88,16 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    // Limited per account: someone holding a stolen access token could otherwise
+    // guess the password here.
     private void requirePassword(User user, String password, String field) {
+        String key = "password-check:" + user.getId();
+        attemptLimiter.check(key, maxFailures);
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            attemptLimiter.recordFailure(key);
             throw ApiException.invalidField(field, "Şifre hatalı");
         }
+        attemptLimiter.reset(key);
     }
 
     private User findUser(String email) {

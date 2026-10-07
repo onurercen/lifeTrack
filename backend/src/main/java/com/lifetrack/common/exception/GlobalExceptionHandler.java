@@ -2,6 +2,7 @@ package com.lifetrack.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -25,6 +26,13 @@ public class GlobalExceptionHandler {
         ResponseEntity<Map<String, Object>> response = error(ex.getStatus(), ex.getMessage());
         if (!ex.getFieldErrors().isEmpty()) {
             response.getBody().put("errors", ex.getFieldErrors());
+        }
+        if (ex.getRetryAfter() != null) {
+            // Round up so clients never retry before the block ends.
+            long seconds = Math.max(1, (ex.getRetryAfter().toMillis() + 999) / 1000);
+            return ResponseEntity.status(ex.getStatus())
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(seconds))
+                .body(response.getBody());
         }
         return response;
     }

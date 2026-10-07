@@ -78,6 +78,26 @@ void main() {
     );
   });
 
+  test('429 yanıtında sunucu mesajını, yoksa varsayılan mesajı taşır', () async {
+    final api = ApiClient(
+      baseUrl: 'http://test/api',
+      client: mockBackend({
+        'POST /api/auth/login': (_) => jsonResponse({'message': 'Lütfen 15 dakika sonra tekrar deneyin.'}, 429),
+        'POST /api/auth/register': (_) => http.Response('', 429),
+      }),
+    );
+
+    await expectLater(
+      api.post('auth/login', body: {}, authenticated: false),
+      throwsA(isA<ApiException>().having((e) => e.message, 'message', 'Lütfen 15 dakika sonra tekrar deneyin.')),
+    );
+    await expectLater(
+      api.post('auth/register', body: {}, authenticated: false),
+      throwsA(isA<ApiException>()
+          .having((e) => e.message, 'message', 'Çok fazla deneme yapıldı, lütfen biraz sonra tekrar deneyin.')),
+    );
+  });
+
   group('oturum yenileme', () {
     test('401 sonrası oturumu yeniler ve isteği yeni tokenla bir kez tekrarlar', () async {
       var token = 'expired';

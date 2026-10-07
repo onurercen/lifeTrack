@@ -27,6 +27,14 @@ Yanıt (`register`, `login`, `refresh`):
   bir token tekrar gönderilirse çalınmış sayılır: kullanıcının **tüm** oturumları kapatılır ve `401` döner.
   Çıkış veya şifre değişikliğiyle iptal edilmiş bir token ise yalnızca `401` alır, diğer oturumlara dokunulmaz.
 - Geçersiz, süresi dolmuş veya iptal edilmiş refresh token `401` döner. `logout` her durumda `204` döner.
+- Başarısız girişler sınırlıdır (varsayılan 15 dakikada): aynı IP'den aynı e-postaya 5, aynı IP'den toplamda 20
+  hatalı deneme. Sınır aşılınca `429` ve saniye cinsinden `Retry-After` başlığı döner; bu sürede doğru şifre de
+  kabul edilmez. Başarılı giriş o e-postanın sayacını sıfırlar. Hesap sınırı IP'ye bağlı olduğu için başka bir
+  IP'den giriş etkilenmez (e-postayı bilen biri hesabı kilitleyemez). Ayarlar: `LOGIN_MAX_FAILURES_PER_ACCOUNT`,
+  `LOGIN_MAX_FAILURES_PER_IP`, `LOGIN_FAILURE_WINDOW_MINUTES`.
+- Sayaçlar bellekte tutulur: yeniden başlatınca sıfırlanır ve birden fazla sunucu arasında paylaşılmaz.
+  Uygulama bir reverse proxy arkasındaysa istemci IP'si için proxy'nin `X-Forwarded-For` başlığına güvenilecek
+  şekilde ayarlanmalıdır, yoksa tüm istemciler proxy'nin IP'sini paylaşır.
 - İstemci akışı: bir istek `401` alırsa `refresh` çağrılır ve istek yeni token ile bir kez tekrarlanır.
   Aynı anda gelen `401`'ler tek bir `refresh` isteğini paylaşmalıdır.
 
@@ -42,6 +50,7 @@ Yanıt (`register`, `login`, `refresh`):
 - Şifre değişince kullanıcının tüm refresh token'ları iptal edilir (diğer cihazlar en geç access token
   süresi dolunca çıkış yapar) ve yanıt olarak çağıran cihaz için yeni bir token çifti döner (`/auth/login` yanıtı ile aynı).
 - Mevcut şifre yanlışsa `400` ve `errors.currentPassword` (silmede `errors.password`) döner.
+  15 dakikada 5 yanlış şifreden sonra bu iki endpoint `429` döner (çalınmış bir token ile şifre denenmesin diye).
 - E-posta değiştirme şimdilik desteklenmiyor.
 
 ## Özet (dashboard)
@@ -165,4 +174,5 @@ Doğrulama hatalarında (ve yanlış şifre gibi alana bağlı hatalarda) alan b
 | 401 | Token yok/geçersiz, ya da hatalı giriş bilgileri |
 | 404 | Kaynak bulunamadı                          |
 | 409 | E-posta zaten kayıtlı                      |
+| 429 | Çok fazla başarısız şifre denemesi (`Retry-After` başlığıyla) |
 | 500 | Beklenmeyen sunucu hatası                  |

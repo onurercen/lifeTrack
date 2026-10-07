@@ -31,3 +31,12 @@ jwt:
   # Access token lifetime; clients renew it with the refresh token.
   expiration: ${JWT_EXPIRATION_MS:900000}
   refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:30}
+
+security:
+  failed-attempts:
+    # Wrong passwords allowed per window, for login (per IP + e-mail) and for
+    # password checks of a signed-in user (change password, delete account).
+    max-per-account: ${LOGIN_MAX_FAILURES_PER_ACCOUNT:5}
+    # Failed logins allowed per IP across all accounts.
+    max-per-ip: ${LOGIN_MAX_FAILURES_PER_IP:20}
+    window-minutes: ${LOGIN_FAILURE_WINDOW_MINUTES:15}
