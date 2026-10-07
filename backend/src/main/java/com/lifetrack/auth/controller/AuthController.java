@@ -2,6 +2,7 @@ package com.lifetrack.auth.controller;
 
 import com.lifetrack.auth.dto.AuthResponse;
 import com.lifetrack.auth.dto.LoginRequest;
+import com.lifetrack.auth.dto.RefreshTokenRequest;
 import com.lifetrack.auth.dto.RegisterRequest;
 import com.lifetrack.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -27,5 +28,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request.refreshToken()));
+    }
+
+    // Public on purpose: a client whose access token already expired must still be able to sign out.
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        authService.logout(request.refreshToken());
+        return ResponseEntity.noContent().build();
     }
 }

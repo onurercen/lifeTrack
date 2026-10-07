@@ -1,12 +1,17 @@
 class AuthResponse {
-  const AuthResponse({required this.token, required this.user});
+  const AuthResponse({required this.token, required this.refreshToken, required this.user});
 
+  /// Short-lived access token.
   final String token;
+
+  /// Exchanged for a new token pair when [token] expires.
+  final String refreshToken;
   final AuthUser user;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
     return AuthResponse(
       token: json['token'] as String,
+      refreshToken: json['refreshToken'] as String,
       user: AuthUser.fromJson(json['user'] as Map<String, dynamic>),
     );
   }

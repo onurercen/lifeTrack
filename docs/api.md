@@ -9,8 +9,25 @@ Token yoksa, geçersizse veya süresi dolmuşsa yanıt `401 Unauthorized` olur.
 
 | Method | Path             | Açıklama                    | Başarılı |
 |--------|------------------|-----------------------------|----------|
-| POST   | `/auth/register` | Kayıt olur, token döner     | 201      |
-| POST   | `/auth/login`    | Giriş yapar, token döner    | 200      |
+| POST   | `/auth/register` | Kayıt olur, token çifti döner | 201    |
+| POST   | `/auth/login`    | Giriş yapar, token çifti döner | 200   |
+| POST   | `/auth/refresh`  | Refresh token ile yeni token çifti alır | 200 |
+| POST   | `/auth/logout`   | Refresh token'ı iptal eder  | 204      |
+
+Yanıt (`register`, `login`, `refresh`):
+
+```json
+{ "token": "<access JWT>", "refreshToken": "<opak anahtar>", "user": { "id": 1, "name": "Ayşe", "email": "ayse@test.com" } }
+```
+
+- `token` kısa ömürlüdür (varsayılan 15 dk, `JWT_EXPIRATION_MS`) ve `Authorization` başlığında gönderilir.
+- `refreshToken` uzun ömürlüdür (varsayılan 30 gün, `JWT_REFRESH_EXPIRATION_DAYS`). Sunucu yalnızca SHA-256 özetini saklar.
+- `refresh` ve `logout` gövdesi: `{ "refreshToken": "..." }`.
+- Her `refresh` eski refresh token'ı geçersiz kılar ve yenisini döner (rotation). Kullanılmış bir refresh token
+  tekrar gönderilirse çalınmış sayılır: kullanıcının **tüm** oturumları kapatılır ve `401` döner.
+- Geçersiz, süresi dolmuş veya iptal edilmiş refresh token `401` döner. `logout` her durumda `204` döner.
+- İstemci akışı: bir istek `401` alırsa `refresh` çağrılır ve istek yeni token ile bir kez tekrarlanır.
+  Aynı anda gelen `401`'ler tek bir `refresh` isteğini paylaşmalıdır.
 
 ## Kullanıcı
 

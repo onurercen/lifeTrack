@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../../../core/network/api_client.dart';
@@ -18,6 +20,7 @@ class AuthController extends ChangeNotifier {
 
   AuthStatus _status = AuthStatus.unknown;
   String? _token;
+  String? _refreshToken;
   AuthUser? _user;
 
   AuthStatus get status => _status;
@@ -33,6 +36,8 @@ class AuthController extends ChangeNotifier {
     }
 
     _token = token;
+    // Missing for sessions saved before refresh tokens existed; those end when the token expires.
+    _refreshToken = await _storage.readRefreshToken();
     try {
       _user = AuthUser.fromJson(await _api.get('users/me') as Map<String, dynamic>);
       _set(AuthStatus.authenticated);
@@ -68,7 +73,36 @@ class AuthController extends ChangeNotifier {
     await _startSession(AuthResponse.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<void> logout() => _clear();
+  /// Ends the session locally right away and tells the server in the background.
+  Future<void> logout() async {
+    final refreshToken = _refreshToken;
+    if (refreshToken != null) {
+      unawaited(
+        _api
+            .post('auth/logout', body: {'refreshToken': refreshToken}, authenticated: false)
+            .then((_) {}, onError: (Object _) {}),
+      );
+    }
+    await _clear();
+  }
+
+  /// Called by [ApiClient] after a 401 to get a new token pair.
+  Future<bool> refreshSession() async {
+    final refreshToken = _refreshToken;
+    if (refreshToken == null) return false;
+    try {
+      final json = await _api.post('auth/refresh', body: {'refreshToken': refreshToken}, authenticated: false);
+      final response = AuthResponse.fromJson(json as Map<String, dynamic>);
+      // The user may have logged out while the request was in flight.
+      if (_refreshToken != refreshToken) return false;
+      await _saveSession(response);
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      if (e.isUnauthorized) return false;
+      rethrow;
+    }
+  }
 
   /// Called by [ApiClient] when an authenticated request returns 401.
   void handleUnauthorized() {
@@ -76,16 +110,22 @@ class AuthController extends ChangeNotifier {
   }
 
   Future<void> _startSession(AuthResponse response) async {
-    await _storage.saveToken(response.token);
-    _token = response.token;
-    _user = response.user;
+    await _saveSession(response);
     _set(AuthStatus.authenticated);
+  }
+
+  Future<void> _saveSession(AuthResponse response) async {
+    _token = response.token;
+    _refreshToken = response.refreshToken;
+    _user = response.user;
+    await _storage.saveTokens(token: response.token, refreshToken: response.refreshToken);
   }
 
   Future<void> _clear() async {
     _token = null;
+    _refreshToken = null;
     _user = null;
-    await _storage.clearToken();
+    await _storage.clear();
     _set(AuthStatus.unauthenticated);
   }
 

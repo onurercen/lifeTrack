@@ -11,6 +11,7 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 | V2 | `V2__run_date_and_optional_fields.sql` | `runs.run_at`; kalori, kitap/medya açıklaması ve medya bağlantısı opsiyonel; açıklamalar 2000 karakter; liste indeksleri |
 | V3 | `V3__lowercase_emails.sql` | Kayıtlı e-postaları küçük harfe çevirir (API artık e-postayı küçük harfle kaydeder ve arar). Yalnızca büyük/küçük harf farkıyla çakışan hesaplara dokunmaz. |
 | V4 | `V4__book_and_media_progress.sql` | Kitaplara durum, sayfa, puan, başlama/bitiş tarihi; medyaya durum, puan, izlenme tarihi. Mevcut kitaplar `WANT_TO_READ`, mevcut medya `COMPLETED` olur. |
+| V5 | `V5__refresh_tokens.sql` | `refresh_tokens` tablosu (kullanıcı silinince satırları da silinir). |
 
 ## Tablolar
 
@@ -25,6 +26,9 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 
 **media**: `id`, `user_id`, `title`, `type`, `url` (null olabilir, ≤2048), `description` (null olabilir, ≤2000),
 `status` (`PLANNED` / `IN_PROGRESS` / `COMPLETED`), `rating` (1–5), `finished_on` (tarih), `created_at`
+
+**refresh_tokens**: `id`, `user_id`, `token_hash` (SHA-256, unique), `expires_at`, `revoked_at`
+(kullanılınca veya çıkışta dolar; tekrar kullanım tespiti için süresi bitene kadar saklanır), `created_at`
 
 ## Flyway öncesi oluşturulmuş veritabanları
 

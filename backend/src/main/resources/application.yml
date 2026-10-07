@@ -28,4 +28,6 @@ cors:
 jwt:
   # Required. Must be at least 32 bytes for HS256.
   secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION_MS:86400000}
+  # Access token lifetime; clients renew it with the refresh token.
+  expiration: ${JWT_EXPIRATION_MS:900000}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:30}

@@ -12,7 +12,9 @@ class AppDependencies {
     late final AuthController auth;
     final client = api ?? ApiClient(tokenProvider: () => auth.token);
     auth = AuthController(api: client, storage: storage ?? AuthStorage());
-    client.onUnauthorized = auth.handleUnauthorized;
+    client
+      ..onUnauthorized = auth.handleUnauthorized
+      ..refreshSession = auth.refreshSession;
     return AppDependencies(api: client, auth: auth);
   }
 

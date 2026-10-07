@@ -23,17 +23,20 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthService(
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         AuthenticationManager authenticationManager,
-        JwtService jwtService
+        JwtService jwtService,
+        RefreshTokenService refreshTokenService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -65,7 +68,17 @@ public class AuthService {
         return toAuthResponse(user);
     }
 
-    private AuthResponse toAuthResponse(User user) {
+    /** Exchanges a refresh token for a new access token and a new refresh token. */
+    public AuthResponse refresh(String refreshToken) {
+        return toAuthResponse(refreshTokenService.consume(refreshToken));
+    }
+
+    public void logout(String refreshToken) {
+        refreshTokenService.revoke(refreshToken);
+    }
+
+    /** Builds a fresh token pair; also used after a password change. */
+    public AuthResponse toAuthResponse(User user) {
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
             .username(user.getEmail())
             .password(user.getPassword())
@@ -73,6 +86,7 @@ public class AuthService {
             .build();
 
         String token = jwtService.generateToken(userDetails);
-        return new AuthResponse(token, new UserResponse(user.getId(), user.getName(), user.getEmail()));
+        String refreshToken = refreshTokenService.issue(user);
+        return new AuthResponse(token, refreshToken, new UserResponse(user.getId(), user.getName(), user.getEmail()));
     }
 }
