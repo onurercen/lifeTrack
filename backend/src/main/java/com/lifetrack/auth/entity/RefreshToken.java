@@ -25,6 +25,10 @@ public class RefreshToken {
 
     private LocalDateTime revokedAt;
 
+    /** True when revoked because it was exchanged for a new token, not by logout or password change. */
+    @Column(nullable = false)
+    private boolean rotated;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -60,6 +64,14 @@ public class RefreshToken {
 
     public void setRevokedAt(LocalDateTime revokedAt) {
         this.revokedAt = revokedAt;
+    }
+
+    public boolean isRotated() {
+        return rotated;
+    }
+
+    public void setRotated(boolean rotated) {
+        this.rotated = rotated;
     }
 
     public LocalDateTime getCreatedAt() {

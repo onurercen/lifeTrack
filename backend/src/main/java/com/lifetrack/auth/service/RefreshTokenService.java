@@ -20,8 +20,9 @@ import java.util.HexFormat;
 
 /**
  * Opaque, single-use refresh tokens. Each use returns the user and revokes the
- * token; the caller issues a new one (rotation). Presenting an already used token
- * revokes all of the user's sessions, since a copy of it may have been stolen.
+ * token; the caller issues a new one (rotation). Presenting a token that was
+ * already rotated revokes all of the user's sessions, since a copy of it may have
+ * been stolen. Tokens revoked by logout or a password change are simply rejected.
  */
 @Service
 public class RefreshTokenService {
@@ -61,14 +62,15 @@ public class RefreshTokenService {
         RefreshToken token = repository.findByTokenHashWithUser(hash(raw)).orElseThrow(RefreshTokenService::invalid);
         LocalDateTime now = LocalDateTime.now(clock);
 
-        if (token.getRevokedAt() != null) {
+        if (token.isRotated()) {
             repository.revokeAllActive(token.getUser(), now);
             throw invalid();
         }
-        if (!token.getExpiresAt().isAfter(now)) {
+        if (token.getRevokedAt() != null || !token.getExpiresAt().isAfter(now)) {
             throw invalid();
         }
         token.setRevokedAt(now);
+        token.setRotated(true);
         return token.getUser();
     }
 

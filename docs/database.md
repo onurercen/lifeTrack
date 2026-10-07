@@ -28,7 +28,8 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 `status` (`PLANNED` / `IN_PROGRESS` / `COMPLETED`), `rating` (1–5), `finished_on` (tarih), `created_at`
 
 **refresh_tokens**: `id`, `user_id`, `token_hash` (SHA-256, unique), `expires_at`, `revoked_at`
-(kullanılınca veya çıkışta dolar; tekrar kullanım tespiti için süresi bitene kadar saklanır), `created_at`
+(kullanılınca, çıkışta veya şifre değişince dolar; süresi bitene kadar saklanır), `rotated` (`refresh` ile
+kullanıldıysa true; böyle bir token tekrar gelirse tüm oturumlar kapatılır), `created_at`
 
 ## Flyway öncesi oluşturulmuş veritabanları
 

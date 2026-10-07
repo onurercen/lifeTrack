@@ -23,8 +23,9 @@ Yanıt (`register`, `login`, `refresh`):
 - `token` kısa ömürlüdür (varsayılan 15 dk, `JWT_EXPIRATION_MS`) ve `Authorization` başlığında gönderilir.
 - `refreshToken` uzun ömürlüdür (varsayılan 30 gün, `JWT_REFRESH_EXPIRATION_DAYS`). Sunucu yalnızca SHA-256 özetini saklar.
 - `refresh` ve `logout` gövdesi: `{ "refreshToken": "..." }`.
-- Her `refresh` eski refresh token'ı geçersiz kılar ve yenisini döner (rotation). Kullanılmış bir refresh token
-  tekrar gönderilirse çalınmış sayılır: kullanıcının **tüm** oturumları kapatılır ve `401` döner.
+- Her `refresh` eski refresh token'ı geçersiz kılar ve yenisini döner (rotation). `refresh` ile zaten kullanılmış
+  bir token tekrar gönderilirse çalınmış sayılır: kullanıcının **tüm** oturumları kapatılır ve `401` döner.
+  Çıkış veya şifre değişikliğiyle iptal edilmiş bir token ise yalnızca `401` alır, diğer oturumlara dokunulmaz.
 - Geçersiz, süresi dolmuş veya iptal edilmiş refresh token `401` döner. `logout` her durumda `204` döner.
 - İstemci akışı: bir istek `401` alırsa `refresh` çağrılır ve istek yeni token ile bir kez tekrarlanır.
   Aynı anda gelen `401`'ler tek bir `refresh` isteğini paylaşmalıdır.

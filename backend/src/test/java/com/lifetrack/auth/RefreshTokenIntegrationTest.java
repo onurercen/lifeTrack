@@ -98,6 +98,22 @@ class RefreshTokenIntegrationTest {
     }
 
     @Test
+    void loggedOutToken_shouldBeRejectedWithoutEndingOtherSessions() throws Exception {
+        String phone = register().get("refreshToken").asText();
+        String tablet = body(mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"email": "refresh@test.com", "password": "123456"}
+                    """))
+            .andExpect(status().isOk())).get("refreshToken").asText();
+
+        logout(phone).andExpect(status().isNoContent());
+        refresh(phone).andExpect(status().isUnauthorized());
+
+        refresh(tablet).andExpect(status().isOk());
+    }
+
+    @Test
     void logout_shouldRevokeTokenAndBeIdempotent() throws Exception {
         String refreshToken = register().get("refreshToken").asText();
 
