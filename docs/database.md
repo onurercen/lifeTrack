@@ -12,10 +12,11 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 | V3 | `V3__lowercase_emails.sql` | Kayıtlı e-postaları küçük harfe çevirir (API artık e-postayı küçük harfle kaydeder ve arar). Yalnızca büyük/küçük harf farkıyla çakışan hesaplara dokunmaz. |
 | V4 | `V4__book_and_media_progress.sql` | Kitaplara durum, sayfa, puan, başlama/bitiş tarihi; medyaya durum, puan, izlenme tarihi. Mevcut kitaplar `WANT_TO_READ`, mevcut medya `COMPLETED` olur. |
 | V5 | `V5__refresh_tokens.sql` | `refresh_tokens` tablosu (kullanıcı silinince satırları da silinir). |
+| V6 | `V6__email_verification_and_codes.sql` | `users.email_verified` (mevcut kullanıcılar `true`), `email_codes` tablosu. |
 
 ## Tablolar
 
-**users**: `id`, `name`, `email` (unique, küçük harf), `password` (BCrypt), `created_at`
+**users**: `id`, `name`, `email` (unique, küçük harf), `password` (BCrypt), `email_verified`, `created_at`
 
 **runs**: `id`, `user_id`, `distance_km`, `duration_minutes`, `calories_burned` (null olabilir),
 `notes` (≤500), `run_at` (koşunun yapıldığı an), `created_at` (kaydın oluşturulduğu an)
@@ -30,6 +31,10 @@ Migration dosyaları: [`backend/src/main/resources/db/migration`](../backend/src
 **refresh_tokens**: `id`, `user_id`, `token_hash` (SHA-256, unique), `expires_at`, `revoked_at`
 (kullanılınca, çıkışta veya şifre değişince dolar; süresi bitene kadar saklanır), `rotated` (`refresh` ile
 kullanıldıysa true; böyle bir token tekrar gelirse tüm oturumlar kapatılır), `created_at`
+
+**email_codes**: `id`, `user_id`, `purpose` (`VERIFY_EMAIL` / `RESET_PASSWORD`), `code_hash` (BCrypt), `attempts`
+(hatalı deneme sayısı), `expires_at`, `created_at`. Kullanıcı ve amaç başına tek satır (`unique (user_id, purpose)`);
+yeni kod aynı satırın üzerine yazılır, kullanılan kod silinir. Kullanıcı silinince satırları da silinir.
 
 ## Flyway öncesi oluşturulmuş veritabanları
 

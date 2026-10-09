@@ -6,11 +6,16 @@ import 'package:http/http.dart' as http;
 import 'package:lifetrack_mobile/app/app.dart';
 import 'package:lifetrack_mobile/app/app_scope.dart';
 import 'package:lifetrack_mobile/core/network/api_client.dart';
+import 'package:lifetrack_mobile/core/utils/file_sharer.dart';
 
 import '../../test_helpers.dart';
 
 /// Pumps the whole app signed in as Ayşe and opens the profile tab.
-Future<AppDependencies> _openProfile(WidgetTester tester, Map<String, Handler> routes) async {
+Future<AppDependencies> _openProfile(
+  WidgetTester tester,
+  Map<String, Handler> routes, {
+  FileSharer? shareFile,
+}) async {
   late final AppDependencies deps;
   final api = ApiClient(
     baseUrl: 'http://test/api',
@@ -21,7 +26,7 @@ Future<AppDependencies> _openProfile(WidgetTester tester, Map<String, Handler> r
       ...routes,
     }),
   );
-  deps = AppDependencies.create(api: api);
+  deps = AppDependencies.create(api: api, shareFile: shareFile);
   await deps.auth.restore();
 
   await tester.pumpWidget(LifeTrackApp(dependencies: deps));
@@ -124,5 +129,51 @@ void main() {
     expect(sent, {'password': '123456'});
     expect(store, isEmpty);
     expect(find.text('Tekrar hoş geldin'), findsOneWidget);
+  });
+
+  testWidgets('verileri JSON dosyası olarak paylaşır', (tester) async {
+    final export = {
+      'exportedAt': '2026-10-09T10:00:00',
+      'account': {'name': 'Ayşe', 'email': 'ayse@test.com', 'createdAt': '2026-01-01T00:00:00'},
+      'runs': [
+        {'id': 1, 'distanceKm': 5.0},
+      ],
+      'books': [],
+      'media': [],
+    };
+    String? sharedName;
+    String? sharedMime;
+    Object? sharedContent;
+    await _openProfile(
+      tester,
+      {'GET /api/users/me/export': (_) => jsonResponse(export)},
+      shareFile: (file, name, {origin}) async {
+        sharedName = name;
+        sharedMime = file.mimeType;
+        sharedContent = jsonDecode(await file.readAsString());
+      },
+    );
+
+    await tester.tap(find.text('Verilerimi indir'));
+    await tester.pumpAndSettle();
+
+    expect(sharedName, matches(RegExp(r'^lifetrack-\d{4}-\d{2}-\d{2}\.json$')));
+    expect(sharedMime, 'application/json');
+    expect(sharedContent, export);
+  });
+
+  testWidgets('dışa aktarma hatasını gösterir', (tester) async {
+    var shared = false;
+    await _openProfile(
+      tester,
+      {'GET /api/users/me/export': (_) => http.Response('', 500)},
+      shareFile: (file, name, {origin}) async => shared = true,
+    );
+
+    await tester.tap(find.text('Verilerimi indir'));
+    await tester.pumpAndSettle();
+
+    expect(shared, isFalse);
+    expect(find.text('Sunucu hatası, lütfen daha sonra tekrar deneyin.'), findsOneWidget);
   });
 }

@@ -37,7 +37,7 @@ void main() {
           final query = request.url.queryParameters['query'];
           queries.add(query);
           final all = [_bookJson(1, 'Dune', 'Frank Herbert'), _bookJson(2, 'Clean Code', 'Robert C. Martin')];
-          return jsonResponse(query == null ? all : all.where((b) => (b['author'] as String).contains(query)).toList());
+          return pageResponse(query == null ? all : all.where((b) => (b['author'] as String).contains(query)).toList());
         },
       }),
     );
@@ -59,7 +59,7 @@ void main() {
       tester,
       mockBackend({
         'GET /api/books': (request) =>
-            jsonResponse(request.url.queryParameters.containsKey('query') ? [] : [_bookJson(1, 'Dune', 'F')]),
+            pageResponse(request.url.queryParameters.containsKey('query') ? [] : [_bookJson(1, 'Dune', 'F')]),
       }),
     );
 
@@ -76,7 +76,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/books': (_) => jsonResponse(books),
+        'GET /api/books': (_) => pageResponse(books),
         'PUT /api/books/3': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           books = [_bookJson(3, sent!['title'] as String, 'Frank Herbert')];
@@ -111,7 +111,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/books': (_) => jsonResponse([]),
+        'GET /api/books': (_) => pageResponse([]),
         'POST /api/books': (_) => jsonResponse({
               'message': 'Gönderilen bilgiler geçersiz',
               'errors': {'author': 'Yazar adı çok uzun'},
@@ -137,7 +137,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/books': (_) => jsonResponse(books),
+        'GET /api/books': (_) => pageResponse(books),
         'POST /api/books': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           books.add({..._bookJson(1, 'Dune', 'Frank Herbert'), 'description': null});
@@ -179,7 +179,7 @@ void main() {
             {..._bookJson(1, 'Dune', 'Frank Herbert'), 'status': 'READING', 'pageCount': 400, 'currentPage': 120},
             {..._bookJson(2, 'Clean Code', 'Robert C. Martin'), 'status': 'FINISHED', 'rating': 4},
           ];
-          return jsonResponse(status == null ? all : all.where((b) => b['status'] == status).toList());
+          return pageResponse(status == null ? all : all.where((b) => b['status'] == status).toList());
         },
       }),
     );
@@ -205,7 +205,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/books': (_) => jsonResponse([]),
+        'GET /api/books': (_) => pageResponse([]),
         'POST /api/books': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           return jsonResponse({..._bookJson(1, 'Dune', 'Frank Herbert'), ...sent!}, 201);
@@ -243,7 +243,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/books': (_) => jsonResponse([
+        'GET /api/books': (_) => pageResponse([
               {..._bookJson(3, 'Dune', 'Frank Herbert'), 'status': 'FINISHED', 'finishedOn': '2026-09-01'},
             ]),
         'PUT /api/books/3': (request) {

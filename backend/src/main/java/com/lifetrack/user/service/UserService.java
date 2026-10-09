@@ -2,6 +2,8 @@ package com.lifetrack.user.service;
 
 import com.lifetrack.auth.dto.AuthResponse;
 import com.lifetrack.auth.dto.UserResponse;
+import com.lifetrack.auth.entity.EmailCodePurpose;
+import com.lifetrack.auth.service.EmailCodeService;
 import com.lifetrack.auth.service.AuthService;
 import com.lifetrack.auth.service.RefreshTokenService;
 import com.lifetrack.book.repository.BookRepository;
@@ -29,6 +31,7 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final AuthService authService;
     private final FailedAttemptLimiter attemptLimiter;
+    private final EmailCodeService emailCodeService;
     private final int maxFailures;
 
     public UserService(
@@ -40,6 +43,7 @@ public class UserService {
         RefreshTokenService refreshTokenService,
         AuthService authService,
         FailedAttemptLimiter attemptLimiter,
+        EmailCodeService emailCodeService,
         @Value("${security.failed-attempts.max-per-account:5}") int maxFailures
     ) {
         this.userRepository = userRepository;
@@ -50,6 +54,7 @@ public class UserService {
         this.refreshTokenService = refreshTokenService;
         this.authService = authService;
         this.attemptLimiter = attemptLimiter;
+        this.emailCodeService = emailCodeService;
         this.maxFailures = maxFailures;
     }
 
@@ -61,6 +66,25 @@ public class UserService {
         User user = findUser(email);
         user.setName(request.name().trim());
         return toResponse(userRepository.save(user));
+    }
+
+    /** Confirms the address with the code sent at registration (or by {@link #resendVerificationCode}). */
+    public UserResponse verifyEmail(String code, String email) {
+        User user = findUser(email);
+        if (!user.isEmailVerified()) {
+            emailCodeService.consume(user, EmailCodePurpose.VERIFY_EMAIL, code.trim());
+            user.setEmailVerified(true);
+            user = userRepository.save(user);
+        }
+        return toResponse(user);
+    }
+
+    public void resendVerificationCode(String email) {
+        User user = findUser(email);
+        if (user.isEmailVerified()) {
+            throw ApiException.badRequest("E-posta adresin zaten doğrulanmış");
+        }
+        authService.sendVerificationCode(user);
     }
 
     /**
@@ -106,6 +130,6 @@ public class UserService {
     }
 
     private static UserResponse toResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return UserResponse.from(user);
     }
 }

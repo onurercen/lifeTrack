@@ -21,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = "security.failed-attempts.max-per-account=2"
+    // The prod profile requires SMTP; nothing is sent, tests use TestMailbox.
+    properties = {"security.failed-attempts.max-per-account=2", "spring.mail.host=localhost"}
 )
 @ActiveProfiles({"test", "prod"})
 class ProductionProfileTest {

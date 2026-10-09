@@ -3,7 +3,9 @@ package com.lifetrack.auth.service;
 import com.lifetrack.auth.dto.AuthResponse;
 import com.lifetrack.auth.dto.LoginRequest;
 import com.lifetrack.auth.dto.RegisterRequest;
+import com.lifetrack.auth.dto.ResetPasswordRequest;
 import com.lifetrack.auth.dto.UserResponse;
+import com.lifetrack.auth.entity.EmailCodePurpose;
 import com.lifetrack.common.exception.ApiException;
 import com.lifetrack.common.security.FailedAttemptLimiter;
 import com.lifetrack.common.security.JwtService;
@@ -27,6 +29,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final FailedAttemptLimiter attemptLimiter;
+    private final EmailCodeService emailCodeService;
+    private final AccountMailService accountMailService;
     private final int maxFailuresPerAccount;
     private final int maxFailuresPerIp;
 
@@ -37,6 +41,8 @@ public class AuthService {
         JwtService jwtService,
         RefreshTokenService refreshTokenService,
         FailedAttemptLimiter attemptLimiter,
+        EmailCodeService emailCodeService,
+        AccountMailService accountMailService,
         @Value("${security.failed-attempts.max-per-account:5}") int maxFailuresPerAccount,
         @Value("${security.failed-attempts.max-per-ip:20}") int maxFailuresPerIp
     ) {
@@ -46,6 +52,8 @@ public class AuthService {
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.attemptLimiter = attemptLimiter;
+        this.emailCodeService = emailCodeService;
+        this.accountMailService = accountMailService;
         this.maxFailuresPerAccount = maxFailuresPerAccount;
         this.maxFailuresPerIp = maxFailuresPerIp;
     }
@@ -61,7 +69,58 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User savedUser = userRepository.save(user);
+        sendVerificationCode(savedUser);
         return toAuthResponse(savedUser);
+    }
+
+    /** Sends a new verification code; throws 429 while the previous one is still fresh. */
+    public void sendVerificationCode(User user) {
+        accountMailService.sendVerificationCode(user, emailCodeService.issue(user, EmailCodePurpose.VERIFY_EMAIL));
+    }
+
+    /**
+     * E-mails a reset code if an account exists. The caller always gets the same
+     * answer, so this can't be used to find out which addresses are registered.
+     * Requests per IP are limited, since each one may send an e-mail.
+     */
+    public void forgotPassword(String email, String clientIp) {
+        String ipKey = "forgot-password-ip:" + clientIp;
+        attemptLimiter.check(ipKey, maxFailuresPerIp);
+        attemptLimiter.recordFailure(ipKey);
+
+        userRepository.findByEmail(email).ifPresent(user -> {
+            try {
+                accountMailService.sendPasswordResetCode(user, emailCodeService.issue(user, EmailCodePurpose.RESET_PASSWORD));
+            } catch (ApiException ex) {
+                // A code was sent moments ago; answering 429 would reveal that the account exists.
+            }
+        });
+    }
+
+    /**
+     * Sets a new password with a code from {@link #forgotPassword}, signs out every
+     * device and starts a new session. The code also proves the address, so an
+     * unverified account becomes verified.
+     */
+    public AuthResponse resetPassword(ResetPasswordRequest request, String clientIp) {
+        String ipKey = "reset-password-ip:" + clientIp;
+        attemptLimiter.check(ipKey, maxFailuresPerIp);
+
+        User user;
+        try {
+            user = userRepository.findByEmail(request.getEmail()).orElseThrow(EmailCodeService::invalid);
+            emailCodeService.consume(user, EmailCodePurpose.RESET_PASSWORD, request.getCode());
+        } catch (ApiException ex) {
+            attemptLimiter.recordFailure(ipKey);
+            throw ex;
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        refreshTokenService.revokeAll(user);
+        attemptLimiter.reset("password-check:" + user.getId());
+        return toAuthResponse(user);
     }
 
     /**
@@ -111,6 +170,6 @@ public class AuthService {
 
         String token = jwtService.generateToken(userDetails);
         String refreshToken = refreshTokenService.issue(user);
-        return new AuthResponse(token, refreshToken, new UserResponse(user.getId(), user.getName(), user.getEmail()));
+        return new AuthResponse(token, refreshToken, UserResponse.from(user));
     }
 }

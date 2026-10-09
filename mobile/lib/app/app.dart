@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../features/auth/presentation/login_screen.dart';
+import '../features/auth/presentation/verify_email_screen.dart';
 import '../features/auth/state/auth_controller.dart';
 import '../features/home/presentation/home_shell.dart';
 import '../features/splash/presentation/splash_screen.dart';
@@ -71,8 +72,11 @@ class _AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (AppScope.of(context).auth.status) {
+    final auth = AppScope.of(context).auth;
+    return switch (auth.status) {
       AuthStatus.unknown => const SplashScreen(),
+      // A null user means the profile couldn't be loaded (offline); show the app.
+      AuthStatus.authenticated when auth.user?.emailVerified == false => const VerifyEmailScreen(),
       AuthStatus.authenticated => const HomeShell(),
       AuthStatus.unauthenticated => const LoginScreen(),
     };

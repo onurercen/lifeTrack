@@ -20,11 +20,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static com.lifetrack.support.TestUsers.verifiedUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,16 +73,16 @@ class BusinessEndpointsIntegrationTest {
         request.setNotes("Sabah koşusu");
 
         mockMvc.perform(post("/api/runs")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.distanceKm").value(5.2))
             .andExpect(jsonPath("$.userEmail").value("test@example.com"));
 
-        mockMvc.perform(get("/api/runs").with(user("test@example.com")))
+        mockMvc.perform(get("/api/runs").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].userEmail").value("test@example.com"));
+            .andExpect(jsonPath("$.items[0].userEmail").value("test@example.com"));
     }
 
     @Test
@@ -93,15 +94,15 @@ class BusinessEndpointsIntegrationTest {
         request.setDescription("Temiz kod yazmak");
 
         mockMvc.perform(post("/api/books")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Clean Code"));
 
-        mockMvc.perform(get("/api/books").param("query", "clean").with(user("test@example.com")))
+        mockMvc.perform(get("/api/books").param("query", "clean").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].title").value("Clean Code"));
+            .andExpect(jsonPath("$.items[0].title").value("Clean Code"));
     }
 
     @Test
@@ -114,20 +115,20 @@ class BusinessEndpointsIntegrationTest {
         request.setDescription("Uzay yolculuğu");
 
         mockMvc.perform(post("/api/media")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Interstellar"));
 
-        mockMvc.perform(get("/api/media").param("query", "interstellar").with(user("test@example.com")))
+        mockMvc.perform(get("/api/media").param("query", "interstellar").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].title").value("Interstellar"));
+            .andExpect(jsonPath("$.items[0].title").value("Interstellar"));
     }
 
     @Test
     void currentUser_shouldReturnProfile() throws Exception {
-        mockMvc.perform(get("/api/users/me").with(user("test@example.com")))
+        mockMvc.perform(get("/api/users/me").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(currentUser.getId()))
             .andExpect(jsonPath("$.name").value("Test User"))
@@ -149,7 +150,7 @@ class BusinessEndpointsIntegrationTest {
     @Test
     void createRun_shouldReturnValidationErrors() throws Exception {
         mockMvc.perform(post("/api/runs")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest())
@@ -164,19 +165,19 @@ class BusinessEndpointsIntegrationTest {
         CreateRunRequest update = runRequest(10.0);
         update.setNotes("Uzun koşu");
         mockMvc.perform(put("/api/runs/{id}", id)
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(update)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.distanceKm").value(10.0))
             .andExpect(jsonPath("$.notes").value("Uzun koşu"));
 
-        mockMvc.perform(delete("/api/runs/{id}", id).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/runs/{id}", id).with(verifiedUser("test@example.com")))
             .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/runs").with(user("test@example.com")))
+        mockMvc.perform(get("/api/runs").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(0));
+            .andExpect(jsonPath("$.items.length()").value(0));
     }
 
     @Test
@@ -185,16 +186,16 @@ class BusinessEndpointsIntegrationTest {
         Long id = createRun("other@example.com", 7.0);
 
         mockMvc.perform(put("/api/runs/{id}", id)
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(runRequest(1.0))))
             .andExpect(status().isNotFound());
 
-        mockMvc.perform(delete("/api/runs/{id}", id).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/runs/{id}", id).with(verifiedUser("test@example.com")))
             .andExpect(status().isNotFound());
 
-        mockMvc.perform(get("/api/runs").with(user("test@example.com")))
-            .andExpect(jsonPath("$.length()").value(0));
+        mockMvc.perform(get("/api/runs").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(0));
     }
 
     @Test
@@ -202,23 +203,23 @@ class BusinessEndpointsIntegrationTest {
         Long cleanCode = createBook("test@example.com", "Clean Code", "Robert C. Martin");
         createBook("test@example.com", "Dune", "Frank Herbert");
 
-        mockMvc.perform(get("/api/books").with(user("test@example.com")))
-            .andExpect(jsonPath("$.length()").value(2));
-        mockMvc.perform(get("/api/books").param("query", "HERBERT").with(user("test@example.com")))
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].title").value("Dune"));
+        mockMvc.perform(get("/api/books").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(2));
+        mockMvc.perform(get("/api/books").param("query", "HERBERT").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.items[0].title").value("Dune"));
 
         mockMvc.perform(put("/api/books/{id}", cleanCode)
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bookRequest("Clean Architecture", "Robert C. Martin"))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.title").value("Clean Architecture"));
 
-        mockMvc.perform(delete("/api/books/{id}", cleanCode).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/books/{id}", cleanCode).with(verifiedUser("test@example.com")))
             .andExpect(status().isNoContent());
-        mockMvc.perform(get("/api/books").with(user("test@example.com")))
-            .andExpect(jsonPath("$.length()").value(1));
+        mockMvc.perform(get("/api/books").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(1));
     }
 
     @Test
@@ -226,16 +227,16 @@ class BusinessEndpointsIntegrationTest {
         userRepository.save(new User("Other", "other@example.com", "secret123"));
         Long id = createBook("other@example.com", "Gizli", "Yazar");
 
-        mockMvc.perform(delete("/api/books/{id}", id).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/books/{id}", id).with(verifiedUser("test@example.com")))
             .andExpect(status().isNotFound());
-        mockMvc.perform(get("/api/books").with(user("test@example.com")))
-            .andExpect(jsonPath("$.length()").value(0));
+        mockMvc.perform(get("/api/books").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(0));
     }
 
     @Test
     void mediaEndpoints_shouldUpdateAndDelete() throws Exception {
         String body = mockMvc.perform(post("/api/media")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mediaRequest("Interstellar"))))
             .andExpect(status().isCreated())
@@ -243,22 +244,22 @@ class BusinessEndpointsIntegrationTest {
         Long id = objectMapper.readTree(body).get("id").asLong();
 
         mockMvc.perform(put("/api/media/{id}", id)
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(mediaRequest("Inception"))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.title").value("Inception"));
 
-        mockMvc.perform(delete("/api/media/{id}", id).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/media/{id}", id).with(verifiedUser("test@example.com")))
             .andExpect(status().isNoContent());
-        mockMvc.perform(delete("/api/media/{id}", id).with(user("test@example.com")))
+        mockMvc.perform(delete("/api/media/{id}", id).with(verifiedUser("test@example.com")))
             .andExpect(status().isNotFound());
     }
 
     @Test
     void createRun_shouldAcceptPastRunAtAndMissingCalories() throws Exception {
         mockMvc.perform(post("/api/runs")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"distanceKm": 4.0, "durationMinutes": 25, "runAt": "2026-09-30T18:15:00"}
@@ -272,23 +273,23 @@ class BusinessEndpointsIntegrationTest {
     void createRun_shouldDefaultRunAtToNowAndSortByIt() throws Exception {
         createRun("test@example.com", 3.0);
         mockMvc.perform(post("/api/runs")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"distanceKm": 9.0, "durationMinutes": 50, "runAt": "2020-01-01T08:00:00"}
                     """))
             .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/runs").with(user("test@example.com")))
-            .andExpect(jsonPath("$[0].distanceKm").value(3.0))
-            .andExpect(jsonPath("$[0].runAt").exists())
-            .andExpect(jsonPath("$[1].distanceKm").value(9.0));
+        mockMvc.perform(get("/api/runs").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items[0].distanceKm").value(3.0))
+            .andExpect(jsonPath("$.items[0].runAt").exists())
+            .andExpect(jsonPath("$.items[1].distanceKm").value(9.0));
     }
 
     @Test
     void createRun_shouldRejectFutureRunAt() throws Exception {
         mockMvc.perform(post("/api/runs")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"distanceKm": 4.0, "durationMinutes": 25, "runAt": "2999-01-01T00:00:00"}
@@ -300,7 +301,7 @@ class BusinessEndpointsIntegrationTest {
     @Test
     void createMedia_shouldAllowMissingUrlAndDescription() throws Exception {
         mockMvc.perform(post("/api/media")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"title": "Severance", "type": "Dizi", "url": "  ", "description": ""}
@@ -313,7 +314,7 @@ class BusinessEndpointsIntegrationTest {
     @Test
     void createMedia_shouldRejectInvalidUrl() throws Exception {
         mockMvc.perform(post("/api/media")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"title": "X", "type": "Film", "url": "not a url"}
@@ -325,7 +326,7 @@ class BusinessEndpointsIntegrationTest {
     @Test
     void createBook_shouldAllowMissingDescription() throws Exception {
         mockMvc.perform(post("/api/books")
-                .with(user("test@example.com"))
+                .with(verifiedUser("test@example.com"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"title": "Dune", "author": "Frank Herbert"}
@@ -344,12 +345,80 @@ class BusinessEndpointsIntegrationTest {
 
     private Long createBook(String email, String title, String author) throws Exception {
         String body = mockMvc.perform(post("/api/books")
-                .with(user(email))
+                .with(verifiedUser(email))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bookRequest(title, author))))
             .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsString();
         return objectMapper.readTree(body).get("id").asLong();
+    }
+
+    @Test
+    void lists_shouldBePaged() throws Exception {
+        createRun("test@example.com", 1.0);
+        createRun("test@example.com", 2.0);
+        createRun("test@example.com", 3.0);
+
+        mockMvc.perform(get("/api/runs").param("size", "2").with(verifiedUser("test@example.com")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items.length()").value(2))
+            .andExpect(jsonPath("$.page").value(0))
+            .andExpect(jsonPath("$.size").value(2))
+            .andExpect(jsonPath("$.totalItems").value(3))
+            .andExpect(jsonPath("$.hasNext").value(true));
+        mockMvc.perform(get("/api/runs").param("page", "1").param("size", "2").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.hasNext").value(false));
+
+        createBook("test@example.com", "Dune", "Frank Herbert");
+        createBook("test@example.com", "Dune Mesihi", "Frank Herbert");
+        mockMvc.perform(get("/api/books").param("query", "dune").param("size", "1").with(verifiedUser("test@example.com")))
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.totalItems").value(2));
+
+        mockMvc.perform(get("/api/media").param("size", "0").with(verifiedUser("test@example.com")))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors.size").exists());
+        mockMvc.perform(get("/api/runs").param("size", "101").with(verifiedUser("test@example.com")))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/runs").param("page", "-1").with(verifiedUser("test@example.com")))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors.page").exists());
+    }
+
+    @Test
+    void runSummary_shouldTotalAllRunsOfTheUser() throws Exception {
+        userRepository.save(new User("Other", "other@example.com", "secret123"));
+        createRun("test@example.com", 5.0);
+        createRun("test@example.com", 2.5);
+        createRun("other@example.com", 42.0);
+
+        mockMvc.perform(get("/api/runs/summary").with(verifiedUser("test@example.com")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalCount").value(2))
+            .andExpect(jsonPath("$.totalDistanceKm").value(7.5))
+            .andExpect(jsonPath("$.totalDurationMinutes").value(60));
+    }
+
+    @Test
+    void export_shouldDownloadOnlyTheUsersData() throws Exception {
+        userRepository.save(new User("Other", "other@example.com", "secret123"));
+        createRun("test@example.com", 5.0);
+        createBook("test@example.com", "Dune", "Frank Herbert");
+        createRun("other@example.com", 42.0);
+        createBook("other@example.com", "Gizli", "Başkası");
+
+        mockMvc.perform(get("/api/users/me/export").with(verifiedUser("test@example.com")))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.startsWith("attachment; filename=\"lifetrack-")))
+            .andExpect(jsonPath("$.exportedAt").exists())
+            .andExpect(jsonPath("$.account.email").value("test@example.com"))
+            .andExpect(jsonPath("$.account.password").doesNotExist())
+            .andExpect(jsonPath("$.runs.length()").value(1))
+            .andExpect(jsonPath("$.runs[0].distanceKm").value(5.0))
+            .andExpect(jsonPath("$.books.length()").value(1))
+            .andExpect(jsonPath("$.books[0].title").value("Dune"))
+            .andExpect(jsonPath("$.media.length()").value(0));
     }
 
     private CreateMediaRequest mediaRequest(String title) {
@@ -371,7 +440,7 @@ class BusinessEndpointsIntegrationTest {
 
     private Long createRun(String email, double distanceKm) throws Exception {
         String body = mockMvc.perform(post("/api/runs")
-                .with(user(email))
+                .with(verifiedUser(email))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(runRequest(distanceKm))))
             .andExpect(status().isCreated())

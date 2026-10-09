@@ -18,17 +18,22 @@ class AuthResponse {
 }
 
 class AuthUser {
-  const AuthUser({this.id, required this.name, required this.email});
+  const AuthUser({this.id, required this.name, required this.email, this.emailVerified = true});
 
   final int? id;
   final String name;
   final String email;
+
+  /// False until the user enters the code sent to [email]; the app shows the
+  /// verification screen instead of their data until then.
+  final bool emailVerified;
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
       id: json['id'] as int?,
       name: json['name'] as String,
       email: json['email'] as String,
+      emailVerified: json['emailVerified'] as bool? ?? true,
     );
   }
 }

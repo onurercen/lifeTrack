@@ -29,9 +29,10 @@ class BooksScreen extends StatelessWidget {
         const ListFilter('Tümü', null),
         for (final status in BookStatus.values) ListFilter(status.label, status.apiValue),
       ],
-      load: (query, filter) => repository.fetchBooks(
+      load: (query, filter, page) => repository.fetchBooks(
         query: query,
         status: filter == null ? null : BookStatus.fromApi(filter),
+        page: page,
       ),
       delete: (book) => repository.deleteBook(book.id),
       idOf: (book) => book.id,

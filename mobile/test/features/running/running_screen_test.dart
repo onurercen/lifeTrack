@@ -32,7 +32,7 @@ void main() {
   setUp(() => useInMemorySecureStorage());
 
   testWidgets('koşu yoksa boş durum mesajı gösterir', (tester) async {
-    await _pump(tester, mockBackend({'GET /api/runs': (_) => jsonResponse([])}));
+    await _pump(tester, mockBackend({'GET /api/runs': (_) => pageResponse([])}));
 
     expect(find.textContaining('Henüz koşu eklemedin'), findsOneWidget);
   });
@@ -41,17 +41,51 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse([_runJson(1, 5.0, notes: 'Sabah'), _runJson(2, 10.0)]),
+        'GET /api/runs': (_) => pageResponse([_runJson(1, 5.0, notes: 'Sabah'), _runJson(2, 10.0)]),
+        // Totals come from the server, not from the loaded page.
+        'GET /api/runs/summary': (_) =>
+            jsonResponse({'totalCount': 12, 'totalDistanceKm': 15.0, 'totalDurationMinutes': 75}),
       }),
     );
 
     expect(find.text('5 km'), findsOneWidget);
     expect(find.text('10 km'), findsOneWidget);
+    expect(find.text('12'), findsOneWidget); // koşu sayısı
     expect(find.text('15'), findsOneWidget); // toplam km
+    expect(find.text('5:00 /km'), findsOneWidget); // ortalama tempo
     expect(find.textContaining('Sabah'), findsOneWidget);
   });
 
-  testWidgets('sunucu hatasında tekrar dene butonu gösterir', (tester) async {
+  testWidgets('aşağı kaydırınca sonraki sayfayı yükler', (tester) async {
+    final pages = <String?>[];
+    await _pump(
+      tester,
+      mockBackend({
+        'GET /api/runs': (request) {
+          final page = request.url.queryParameters['page'];
+          pages.add(page);
+          expect(request.url.queryParameters['size'], '20');
+          if (page == '0') {
+            return pageResponse([for (var i = 1; i <= 20; i++) _runJson(i, i.toDouble())], hasNext: true);
+          }
+          return pageResponse([_runJson(21, 21.0)], page: 1);
+        },
+        'GET /api/runs/summary': (_) =>
+            jsonResponse({'totalCount': 21, 'totalDistanceKm': 231.0, 'totalDurationMinutes': 630}),
+      }),
+    );
+
+    expect(pages, ['0']);
+    expect(find.text('21 km'), findsNothing);
+
+    await tester.scrollUntilVisible(find.text('21 km'), 300);
+    await tester.pumpAndSettle();
+
+    expect(pages, ['0', '1']);
+    expect(find.text('21 km'), findsOneWidget);
+  });
+
+    testWidgets('sunucu hatasında tekrar dene butonu gösterir', (tester) async {
     await _pump(tester, mockBackend({'GET /api/runs': (_) => http.Response('', 500)}));
 
     expect(find.text('Tekrar dene'), findsOneWidget);
@@ -63,7 +97,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse(runs),
+        'GET /api/runs': (_) => pageResponse(runs),
         'POST /api/runs': (request) {
           sentBody = jsonDecode(request.body) as Map<String, dynamic>;
           runs.add(_runJson(1, 5.5));
@@ -97,7 +131,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse([]),
+        'GET /api/runs': (_) => pageResponse([]),
         'POST /api/runs': (_) {
           posted = true;
           return jsonResponse({}, 201);
@@ -119,7 +153,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse([_runJson(7, 5.0)]),
+        'GET /api/runs': (_) => pageResponse([_runJson(7, 5.0)]),
         'DELETE /api/runs/7': (_) {
           deleted = true;
           return http.Response('', 204);
@@ -142,7 +176,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse(runs),
+        'GET /api/runs': (_) => pageResponse(runs),
         'POST /api/runs': (request) {
           sentBody = jsonDecode(request.body) as Map<String, dynamic>;
           runs.add({..._runJson(1, 3.0), 'caloriesBurned': null});
@@ -168,7 +202,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/runs': (_) => jsonResponse([{..._runJson(4, 5.0), 'runAt': '2026-09-30T18:15:00'}]),
+        'GET /api/runs': (_) => pageResponse([{..._runJson(4, 5.0), 'runAt': '2026-09-30T18:15:00'}]),
         'PUT /api/runs/4': (request) {
           sentBody = jsonDecode(request.body) as Map<String, dynamic>;
           return jsonResponse(_runJson(4, 6.0));

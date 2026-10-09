@@ -7,8 +7,8 @@ Uygulama tek bir adresten sunulur:
 | `https://<alan-adı>/` | Flutter web uygulaması (telefonda "Ana ekrana ekle" ile uygulama gibi açılır) |
 | `https://<alan-adı>/api/...` | Backend API |
 
-Web uygulaması ve API aynı origin'de olduğu için CORS gerekmez. Mobil projede şu an yalnızca **web** platformu var;
-Android/iOS uygulaması için önce `flutter create --platforms=android,ios .` ile platform eklenmesi gerekir.
+Web uygulaması ve API aynı origin'de olduğu için CORS gerekmez. Android ve iOS uygulamaları da aynı API'yi kullanır
+(bkz. [Android ve iOS uygulaması](#android-ve-ios-uygulaması)).
 
 ## Ortam değişkenleri
 
@@ -17,6 +17,10 @@ Android/iOS uygulaması için önce `flutter create --platforms=android,ios .` i
 | `SPRING_PROFILES_ACTIVE` | evet | `prod` olmalı (`application-prod.yml`) |
 | `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | evet | PostgreSQL bağlantısı, ör. `jdbc:postgresql://host:5432/lifetrack` |
 | `JWT_SECRET` | evet | En az 32 bayt. Üret: `openssl rand -base64 48`. Değişirse herkes yeniden giriş yapar |
+| `SPRING_MAIL_HOST` | evet | SMTP sunucusu. Doğrulama ve şifre sıfırlama kodları e-postayla gider; prod profili bu olmadan başlamaz |
+| `SPRING_MAIL_PORT` | hayır | Varsayılan `587` (STARTTLS) |
+| `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | sağlayıcıya göre | SMTP kullanıcı adı ve şifresi (Gmail'de "uygulama şifresi") |
+| `MAIL_FROM` | evet | Gönderen, ör. `LifeTrack <no-reply@alan-adi.com>`. Çoğu sağlayıcı doğrulanmış bir adres/alan adı ister |
 | `TZ` | evet | `Europe/Istanbul`. Koşu tarihleri saat dilimsiz saklanır; sunucu kullanıcıyla aynı saat diliminde olmalı |
 | `JWT_EXPIRATION_MS` | hayır | Access token süresi, varsayılan `900000` (15 dk) |
 | `JWT_REFRESH_EXPIRATION_DAYS` | hayır | Refresh token süresi, varsayılan `30` |
@@ -90,6 +94,46 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod exec -T postgres 
 docker compose -f docker-compose.prod.yml --env-file .env.prod start backend
 ```
 
+## E-posta (SMTP)
+
+Kayıt sonrası doğrulama ve şifre sıfırlama kodları e-postayla gönderilir, bu yüzden prod'da SMTP zorunludur.
+Herhangi bir SMTP sağlayıcısı olur:
+
+- **Gmail**: `smtp.gmail.com`, port `587`, kullanıcı adı Gmail adresi, şifre olarak Google hesabından alınan
+  [uygulama şifresi](https://myaccount.google.com/apppasswords) (2 adımlı doğrulama açık olmalı). Kişisel kullanım
+  için yeterli, günlük gönderim sınırı var.
+- **Brevo, Mailgun, Amazon SES, Resend** gibi servisler: kendi alan adından göndermek için uygundur. Sağlayıcının
+  verdiği SPF/DKIM DNS kayıtlarını eklemezsen e-postalar spam'e düşebilir.
+
+E-posta gönderimi arka planda yapılır. SMTP hatası isteği bozmaz, yalnızca backend loguna yazılır:
+```bash
+docker compose -f docker-compose.prod.yml logs backend | grep "Could not send e-mail"
+```
+SMTP sunucusuna ulaşılamaması sağlık kontrolünü etkilemez.
+
+Geliştirmede `SPRING_MAIL_HOST` boş bırakılabilir. Bu durumda e-postalar gönderilmez, içerikleri (kod dahil)
+backend loguna yazılır.
+
+## Android ve iOS uygulaması
+
+`mobile/` altında Android ve iOS projeleri var (paket adı `com.lifetrack.lifetrack_mobile`). Uygulama API adresini
+derleme sırasında alır:
+
+```bash
+cd mobile
+flutter build apk --release --dart-define=API_BASE_URL=https://<alan-adı>/api        # Android APK
+flutter build appbundle --release --dart-define=API_BASE_URL=https://<alan-adı>/api  # Google Play
+flutter build ipa --release --dart-define=API_BASE_URL=https://<alan-adı>/api        # iOS (macOS + Xcode)
+```
+
+- Release derlemeleri yalnızca HTTPS ile çalışır. Düz HTTP'ye yalnızca Android debug derlemesinde ve iOS'ta yerel
+  ağ adreslerinde izin verilir (geliştirme backend'i için).
+- Mağazaya yüklemeden önce yapılacaklar: Android için imzalama anahtarı oluşturup `android/app/build.gradle.kts`
+  içindeki `release` imzalama ayarını değiştirmek (şu an debug anahtarıyla imzalanıyor), iOS için Xcode'da
+  takım (Team) ve bundle id seçmek. İkon için `android/app/src/main/res/mipmap-*` ve
+  `ios/Runner/Assets.xcassets/AppIcon.appiconset` altındaki varsayılan Flutter ikonları değiştirilmeli.
+- Native uygulama sunucuya farklı bir origin'den gelmez, bu yüzden CORS ayarı gerekmez.
+
 ## Yerelde deneme
 
 Aynı yapı bilgisayarda `DOMAIN=localhost` ile çalışır (Caddy kendi sertifikasını üretir, tarayıcı uyarı verir):
@@ -104,6 +148,7 @@ open https://localhost:8443
 
 - [ ] `JWT_SECRET` ve `POSTGRES_PASSWORD` rastgele ve güçlü, `.env.prod` repoya girmiyor
 - [ ] `SPRING_PROFILES_ACTIVE=prod` ve `TZ=Europe/Istanbul`
+- [ ] SMTP ayarlı; yeni bir hesapla kayıt olunca doğrulama kodu geliyor (spam klasörüne de bak)
 - [ ] Backend ve PostgreSQL portları internete kapalı (yalnızca 80/443 açık)
 - [ ] `https://<alan-adı>` açılıyor; sağlık kontrolü dışarıdan erişilemiyor (`/api/actuator/health` → `401`)
 - [ ] İlk yedek `./backups` altında oluştu; bir kez geri yükleme denendi

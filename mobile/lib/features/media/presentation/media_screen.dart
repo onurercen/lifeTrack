@@ -32,9 +32,10 @@ class MediaScreen extends StatelessWidget {
         const ListFilter('Tümü', null),
         for (final status in MediaStatus.values) ListFilter(status.label, status.apiValue),
       ],
-      load: (query, filter) => repository.fetchMedia(
+      load: (query, filter, page) => repository.fetchMedia(
         query: query,
         status: filter == null ? null : MediaStatus.fromApi(filter),
+        page: page,
       ),
       delete: (media) => repository.deleteMedia(media.id),
       idOf: (media) => media.id,

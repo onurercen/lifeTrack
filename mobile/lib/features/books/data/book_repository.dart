@@ -1,4 +1,5 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/page_result.dart';
 import '../models/book.dart';
 
 class BookRepository {
@@ -6,13 +7,14 @@ class BookRepository {
 
   final ApiClient _api;
 
-  Future<List<Book>> fetchBooks({String? query, BookStatus? status}) async {
+  Future<PageResult<Book>> fetchBooks({String? query, BookStatus? status, int page = 0}) async {
     final params = {
+      ...PageResult.query(page),
       if (query != null) 'query': query,
       if (status != null) 'status': status.apiValue,
     };
-    final json = await _api.get('books', query: params.isEmpty ? null : params) as List<dynamic>;
-    return json.map((e) => Book.fromJson(e as Map<String, dynamic>)).toList();
+    final json = await _api.get('books', query: params);
+    return PageResult.fromJson(json as Map<String, dynamic>, Book.fromJson);
   }
 
   Future<Book> createBook(BookInput input) async {

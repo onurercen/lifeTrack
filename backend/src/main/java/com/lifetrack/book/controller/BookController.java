@@ -4,6 +4,7 @@ import com.lifetrack.book.dto.BookResponse;
 import com.lifetrack.book.dto.CreateBookRequest;
 import com.lifetrack.book.service.BookService;
 import com.lifetrack.book.entity.BookStatus;
+import com.lifetrack.common.web.PageResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -24,12 +24,14 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookResponse>> getBooks(
+    public ResponseEntity<PageResponse<BookResponse>> getBooks(
         @RequestParam(required = false) String query,
         @RequestParam(required = false) BookStatus status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "" + PageResponse.DEFAULT_SIZE) int size,
         @AuthenticationPrincipal UserDetails principal
     ) {
-        return ResponseEntity.ok(bookService.searchBooks(query, status, principal.getUsername()));
+        return ResponseEntity.ok(bookService.searchBooks(query, status, principal.getUsername(), PageResponse.request(page, size)));
     }
 
     @PostMapping

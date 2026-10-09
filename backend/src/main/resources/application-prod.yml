@@ -29,3 +29,8 @@ cors:
   # The web app is served from the same origin as the API, so no cross-origin
   # access is needed. Set CORS_ALLOWED_ORIGIN_PATTERNS only for another web origin.
   allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:}
+
+app:
+  mail:
+    # Verification and password reset depend on e-mail; refuse to start without SMTP.
+    required: true

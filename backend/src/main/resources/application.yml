@@ -14,6 +14,20 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  # SMTP for verification and password reset codes. Spring Boot reads
+  # SPRING_MAIL_HOST, SPRING_MAIL_PORT, SPRING_MAIL_USERNAME and SPRING_MAIL_PASSWORD
+  # from the environment; without SPRING_MAIL_HOST e-mails are only logged.
+  # (spring.mail.host is not listed here: any value, even empty, would enable SMTP.)
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
   flyway:
     # Databases created before Flyway (by ddl-auto=update) already match V1.
     baseline-on-migrate: true
@@ -33,6 +47,10 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    mail:
+      # An unreachable SMTP server must not mark the app unhealthy and get it restarted.
+      enabled: false
 
 cors:
   # Comma separated. Production: set CORS_ALLOWED_ORIGIN_PATTERNS to the real web origin(s).
@@ -53,3 +71,7 @@ security:
     # Failed logins allowed per IP across all accounts.
     max-per-ip: ${LOGIN_MAX_FAILURES_PER_IP:20}
     window-minutes: ${LOGIN_FAILURE_WINDOW_MINUTES:15}
+
+app:
+  mail:
+    from: ${MAIL_FROM:LifeTrack <no-reply@localhost>}

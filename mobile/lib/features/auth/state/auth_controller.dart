@@ -73,6 +73,30 @@ class AuthController extends ChangeNotifier {
     await _startSession(AuthResponse.fromJson(json as Map<String, dynamic>));
   }
 
+  /// Confirms the e-mail address with the code sent at registration.
+  Future<void> verifyEmail(String code) async {
+    final json = await _api.post('users/me/verify-email', body: {'code': code});
+    _user = AuthUser.fromJson(json as Map<String, dynamic>);
+    notifyListeners();
+  }
+
+  /// Sends a new verification code; the server allows one per minute.
+  Future<void> resendVerificationCode() => _api.post('users/me/verify-email/resend');
+
+  /// E-mails a reset code if [email] belongs to an account; succeeds either way.
+  Future<void> forgotPassword(String email) =>
+      _api.post('auth/forgot-password', body: {'email': email}, authenticated: false);
+
+  /// Sets a new password with the e-mailed code and signs in. Other devices are signed out.
+  Future<void> resetPassword({required String email, required String code, required String newPassword}) async {
+    final json = await _api.post(
+      'auth/reset-password',
+      body: {'email': email, 'code': code, 'newPassword': newPassword},
+      authenticated: false,
+    );
+    await _startSession(AuthResponse.fromJson(json as Map<String, dynamic>));
+  }
+
   /// Ends the session locally right away and tells the server in the background.
   Future<void> logout() async {
     final refreshToken = _refreshToken;

@@ -1,4 +1,5 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/page_result.dart';
 import '../models/run.dart';
 
 class RunRepository {
@@ -6,9 +7,14 @@ class RunRepository {
 
   final ApiClient _api;
 
-  Future<List<Run>> fetchRuns() async {
-    final json = await _api.get('runs') as List<dynamic>;
-    return json.map((e) => Run.fromJson(e as Map<String, dynamic>)).toList();
+  Future<PageResult<Run>> fetchRuns({int page = 0}) async {
+    final json = await _api.get('runs', query: PageResult.query(page));
+    return PageResult.fromJson(json as Map<String, dynamic>, Run.fromJson);
+  }
+
+  /// Totals over all runs, not just the loaded pages.
+  Future<RunSummary> fetchSummary() async {
+    return RunSummary.fromJson(await _api.get('runs/summary') as Map<String, dynamic>);
   }
 
   Future<Run> createRun(RunInput input) async {

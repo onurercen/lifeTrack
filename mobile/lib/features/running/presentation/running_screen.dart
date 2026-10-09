@@ -18,36 +18,59 @@ class RunningScreen extends StatelessWidget {
       addLabel: 'Koşu ekle',
       emptyIcon: Icons.directions_run,
       emptyText: 'Henüz koşu eklemedin.\nİlk koşunu eklemek için aşağıdaki butona dokun.',
-      load: (_, __) => repository.fetchRuns(),
+      load: (_, __, page) => repository.fetchRuns(page: page),
       delete: (run) => repository.deleteRun(run.id),
       idOf: (run) => run.id,
       deletePrompt: (run) => '${formatDecimal(run.distanceKm)} km koşu silinsin mi?',
-      headerBuilder: (runs) => _RunSummary(runs: runs),
+      headerBuilder: (generation) => _RunSummary(key: ValueKey(generation), repository: repository),
       itemBuilder: (context, run, onTap) => _RunTile(run: run, onTap: onTap),
       formBuilder: (run) => RunFormScreen(repository: repository, run: run),
     );
   }
 }
 
-class _RunSummary extends StatelessWidget {
-  const _RunSummary({required this.runs});
+/// Totals over all runs; the list only holds the pages loaded so far.
+/// Rebuilt with a new key after every list change, which loads them again.
+class _RunSummary extends StatefulWidget {
+  const _RunSummary({super.key, required this.repository});
 
-  final List<Run> runs;
+  final RunRepository repository;
+
+  @override
+  State<_RunSummary> createState() => _RunSummaryState();
+}
+
+class _RunSummaryState extends State<_RunSummary> {
+  late final Future<RunSummary> _summary = widget.repository.fetchSummary();
 
   @override
   Widget build(BuildContext context) {
-    final totalKm = runs.fold<double>(0, (sum, r) => sum + r.distanceKm);
-    final totalMinutes = runs.fold<int>(0, (sum, r) => sum + r.durationMinutes);
+    return FutureBuilder<RunSummary>(
+      future: _summary,
+      builder: (context, snapshot) {
+        final summary = snapshot.data;
+        // Placeholders while loading, and if the totals can't be loaded.
+        return _buildCard(
+          count: summary == null ? '—' : '${summary.totalCount}',
+          totalKm: summary == null ? '—' : formatDecimal(summary.totalDistanceKm),
+          pace: summary == null || summary.totalDistanceKm == 0
+              ? '—'
+              : formatPace(summary.totalDurationMinutes / summary.totalDistanceKm),
+        );
+      },
+    );
+  }
 
+  Widget _buildCard({required String count, required String totalKm, required String pace}) {
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Row(
           children: [
-            _Stat(label: 'Koşu', value: '${runs.length}'),
-            _Stat(label: 'Toplam km', value: formatDecimal(totalKm)),
-            _Stat(label: 'Ort. tempo', value: totalKm == 0 ? '—' : formatPace(totalMinutes / totalKm)),
+            _Stat(label: 'Koşu', value: count),
+            _Stat(label: 'Toplam km', value: totalKm),
+            _Stat(label: 'Ort. tempo', value: pace),
           ],
         ),
       ),

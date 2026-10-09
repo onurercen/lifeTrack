@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static com.lifetrack.support.TestUsers.verifiedUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -159,12 +159,12 @@ class BookAndMediaProgressIntegrationTest {
             {"title": "Clean Code", "author": "Robert C. Martin", "status": "READING"}
             """);
 
-        mockMvc.perform(get("/api/books").param("status", "READING").with(user(EMAIL)))
-            .andExpect(jsonPath("$.length()").value(2));
-        mockMvc.perform(get("/api/books").param("status", "READING").param("query", "herbert").with(user(EMAIL)))
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].title").value("Dune"));
-        mockMvc.perform(get("/api/books").param("status", "NOPE").with(user(EMAIL)))
+        mockMvc.perform(get("/api/books").param("status", "READING").with(verifiedUser(EMAIL)))
+            .andExpect(jsonPath("$.items.length()").value(2));
+        mockMvc.perform(get("/api/books").param("status", "READING").param("query", "herbert").with(verifiedUser(EMAIL)))
+            .andExpect(jsonPath("$.items.length()").value(1))
+            .andExpect(jsonPath("$.items[0].title").value("Dune"));
+        mockMvc.perform(get("/api/books").param("status", "NOPE").with(verifiedUser(EMAIL)))
             .andExpect(status().isBadRequest());
     }
 
@@ -190,10 +190,10 @@ class BookAndMediaProgressIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.finishedOn").doesNotExist());
 
-        mockMvc.perform(get("/api/media").param("status", "IN_PROGRESS").with(user(EMAIL)))
-            .andExpect(jsonPath("$.length()").value(1));
-        mockMvc.perform(get("/api/media").param("status", "COMPLETED").with(user(EMAIL)))
-            .andExpect(jsonPath("$.length()").value(0));
+        mockMvc.perform(get("/api/media").param("status", "IN_PROGRESS").with(verifiedUser(EMAIL)))
+            .andExpect(jsonPath("$.items.length()").value(1));
+        mockMvc.perform(get("/api/media").param("status", "COMPLETED").with(verifiedUser(EMAIL)))
+            .andExpect(jsonPath("$.items.length()").value(0));
     }
 
     @Test
@@ -209,7 +209,7 @@ class BookAndMediaProgressIntegrationTest {
         org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder request,
         String body
     ) throws Exception {
-        return mockMvc.perform(request.with(user(EMAIL)).contentType(MediaType.APPLICATION_JSON).content(body));
+        return mockMvc.perform(request.with(verifiedUser(EMAIL)).contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
     private Long idOf(ResultActions result) throws Exception {

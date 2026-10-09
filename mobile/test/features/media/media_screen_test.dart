@@ -25,7 +25,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/media': (_) => jsonResponse(items),
+        'GET /api/media': (_) => pageResponse(items),
         'POST /api/media': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           items.add({...sent!, 'id': 1, 'userEmail': 'a@b.c', 'createdAt': '2026-10-04T07:30:00'});
@@ -65,7 +65,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/media': (_) => jsonResponse([]),
+        'GET /api/media': (_) => pageResponse([]),
         'POST /api/media': (_) {
           posted = true;
           return jsonResponse({}, 201);
@@ -89,7 +89,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/media': (_) => jsonResponse([
+        'GET /api/media': (_) => pageResponse([
               {
                 'id': 5,
                 'title': 'Eski',
@@ -116,7 +116,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/media': (_) => jsonResponse(items),
+        'GET /api/media': (_) => pageResponse(items),
         'POST /api/media': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           items.add({...sent!, 'id': 2, 'userEmail': 'a@b.c', 'createdAt': '2026-10-04T07:30:00'});
@@ -153,7 +153,7 @@ void main() {
     await _pump(
       tester,
       mockBackend({
-        'GET /api/media': (_) => jsonResponse(items),
+        'GET /api/media': (_) => pageResponse(items),
         'POST /api/media': (request) {
           sent = jsonDecode(request.body) as Map<String, dynamic>;
           items.add({...sent!, 'id': 1, 'userEmail': 'a@b.c', 'createdAt': '2026-10-04T07:30:00'});
@@ -189,7 +189,7 @@ void main() {
       mockBackend({
         'GET /api/media': (request) {
           statuses.add(request.url.queryParameters['status']);
-          return jsonResponse([]);
+          return pageResponse([]);
         },
       }),
     );

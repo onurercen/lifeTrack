@@ -49,7 +49,7 @@ class DatabaseMigrationTest {
             .toList();
         assertThat(applied).contains(
             "V1__initial_schema.sql", "V2__run_date_and_optional_fields.sql", "V3__lowercase_emails.sql",
-            "V4__book_and_media_progress.sql");
+            "V4__book_and_media_progress.sql", "V5__refresh_tokens.sql", "V6__email_verification_and_codes.sql");
 
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         assertThat(isNullable(jdbc, "runs", "calories_burned")).isTrue();
@@ -121,6 +121,20 @@ class DatabaseMigrationTest {
         assertThat(jdbc.queryForObject("select status from media", String.class)).isEqualTo("COMPLETED");
         assertThat(isNullable(jdbc, "books", "page_count")).isTrue();
         assertThat(isNullable(jdbc, "media", "finished_on")).isTrue();
+    }
+
+    @Test
+    void existingUsers_shouldCountAsVerifiedButNewOnesNot() throws Exception {
+        DataSource dataSource = newDatabase("verification");
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+        jdbc.execute(readMigration("V1__initial_schema.sql"));
+        jdbc.update("insert into users (name, email, password, created_at) values ('A', 'old@test.com', 'x', now())");
+
+        flyway(dataSource).migrate();
+        jdbc.update("insert into users (name, email, password, created_at) values ('B', 'new@test.com', 'x', now())");
+
+        assertThat(jdbc.queryForList("select email_verified from users order by id", Boolean.class))
+            .containsExactly(true, false);
     }
 
     private static Flyway flyway(DataSource dataSource) {

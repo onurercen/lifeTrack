@@ -1,12 +1,15 @@
 package com.lifetrack.run.service;
 
 import com.lifetrack.common.exception.ApiException;
+import com.lifetrack.common.web.PageResponse;
 import com.lifetrack.run.dto.CreateRunRequest;
 import com.lifetrack.run.dto.RunResponse;
+import com.lifetrack.run.dto.RunSummaryResponse;
 import com.lifetrack.run.entity.Run;
 import com.lifetrack.run.repository.RunRepository;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -57,11 +60,25 @@ public class RunService {
         runRepository.delete(findOwnedRun(id, email));
     }
 
-    public List<RunResponse> getRunsByUser(String email) {
+    public PageResponse<RunResponse> getRuns(String email, Pageable pageable) {
+        return PageResponse.of(runRepository.findByUserEmailOrderByRunAtDescIdDesc(email, pageable).map(this::toResponse));
+    }
+
+    /** Every run, newest first; for the data export. */
+    public List<RunResponse> getAllRuns(String email) {
         return runRepository.findByUserEmailOrderByRunAtDescIdDesc(email)
             .stream()
             .map(this::toResponse)
             .toList();
+    }
+
+    /** Totals over all runs, since a page of the list only holds some of them. */
+    public RunSummaryResponse getSummary(String email) {
+        return new RunSummaryResponse(
+            runRepository.countByUserEmail(email),
+            runRepository.sumDistanceByUserEmail(email),
+            runRepository.sumDurationByUserEmail(email)
+        );
     }
 
     // Another user's run is reported as missing, so ids can't be probed.

@@ -10,6 +10,9 @@ import com.lifetrack.user.repository.UserRepository;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,6 +64,8 @@ class PostgresSchemaValidationTest {
     @Autowired
     private MediaRepository mediaRepository;
 
+    private static final Pageable ALL = PageRequest.of(0, 100);
+
     @Test
     void contextLoads_withMigratedPostgresSchema() {
         // Passing means Flyway ran and Hibernate validated every entity against PostgreSQL.
@@ -73,13 +78,18 @@ class PostgresSchemaValidationTest {
         saveBook(user, "Clean Code", BookStatus.WANT_TO_READ);
 
         // A null status and an empty query must bind as typed parameters on PostgreSQL.
-        assertThat(bookRepository.search("pg@example.com", "", null)).hasSize(2);
-        assertThat(bookRepository.search("pg@example.com", "", BookStatus.READING))
+        assertThat(bookRepository.search("pg@example.com", "", null, ALL)).hasSize(2);
+        assertThat(bookRepository.search("pg@example.com", "", BookStatus.READING, ALL))
             .extracting(Book::getTitle).containsExactly("Dune");
-        assertThat(bookRepository.search("pg@example.com", "CLEAN", null))
+        assertThat(bookRepository.search("pg@example.com", "CLEAN", null, ALL))
             .extracting(Book::getTitle).containsExactly("Clean Code");
-        assertThat(mediaRepository.search("pg@example.com", "", null)).isEmpty();
-        assertThat(mediaRepository.search("pg@example.com", "x", MediaStatus.COMPLETED)).isEmpty();
+        assertThat(mediaRepository.search("pg@example.com", "", null, ALL)).isEmpty();
+        assertThat(mediaRepository.search("pg@example.com", "x", MediaStatus.COMPLETED, ALL)).isEmpty();
+
+        // A partial page also runs the derived count query.
+        Page<Book> firstPage = bookRepository.search("pg@example.com", "", null, PageRequest.of(0, 1));
+        assertThat(firstPage.getContent()).hasSize(1);
+        assertThat(firstPage.getTotalElements()).isEqualTo(2);
     }
 
     private void saveBook(User owner, String title, BookStatus status) {

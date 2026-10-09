@@ -4,9 +4,9 @@ Koşu, kitap ve medya (film/dizi) takibini tek yerde toplayan kişisel takip uyg
 
 | Katman  | Teknoloji                                        |
 |---------|--------------------------------------------------|
-| Backend | Java 17, Spring Boot 3.3, Spring Security + JWT, JPA |
+| Backend | Java 17, Spring Boot 3.5, Spring Security + JWT, JPA |
 | Veritabanı | PostgreSQL 16 (Docker)                        |
-| Mobil   | Flutter (Dart 3)                                 |
+| Mobil   | Flutter (Dart 3): Android, iOS ve web            |
 
 ## Proje yapısı
 
@@ -40,7 +40,11 @@ set -a; source ../.env; set +a
 mvn spring-boot:run
 ```
 
-`JWT_SECRET` tanımlı değilse uygulama başlamaz. API `http://localhost:8080/api` adresinde,
+`JWT_SECRET` tanımlı değilse uygulama başlamaz.
+
+Kayıt sonrası e-posta doğrulama ve şifre sıfırlama kodları e-postayla gönderilir. Yerelde SMTP ayarlamak
+zorunlu değildir: `SPRING_MAIL_HOST` boşsa e-postalar gönderilmez, içerikleri (kod dahil) backend loguna yazılır.
+Gerçek gönderim için `.env` içindeki `SPRING_MAIL_*` satırlarını doldurun. API `http://localhost:8080/api` adresinde,
 Swagger arayüzü `http://localhost:8080/swagger-ui.html` adresinde çalışır.
 
 Testler gömülü H2 veritabanı ile çalışır, PostgreSQL gerektirmez:
@@ -69,6 +73,9 @@ flutter pub get
 flutter run
 ```
 
+`flutter run` bağlı cihazı ya da emülatörü seçer (`-d chrome`, `-d android`, `-d ios` ile belirtilebilir).
+Android için Android Studio/SDK, iOS için macOS ve Xcode gerekir.
+
 API adresi Android emülatöründe otomatik olarak `10.0.2.2`, diğer platformlarda `localhost` olur.
 Gerçek cihaz için:
 
@@ -86,7 +93,7 @@ Prod ayarları, `docker-compose.prod.yml` (HTTPS, web uygulaması, günlük yede
 `.github/workflows/ci.yml` her push (main) ve pull request'te çalışır:
 
 - Backend: `mvn verify` ve Docker imajı derlemesi
-- Mobil: `flutter analyze`, `flutter test` ve web derlemesi
+- Mobil: `flutter analyze`, `flutter test`, web derlemesi ve Android (debug APK) derlemesi
 
 ## Veritabanı
 

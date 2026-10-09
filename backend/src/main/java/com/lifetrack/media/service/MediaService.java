@@ -1,6 +1,7 @@
 package com.lifetrack.media.service;
 
 import com.lifetrack.common.exception.ApiException;
+import com.lifetrack.common.web.PageResponse;
 import com.lifetrack.media.dto.CreateMediaRequest;
 import com.lifetrack.media.dto.MediaResponse;
 import com.lifetrack.media.entity.Media;
@@ -8,6 +9,7 @@ import com.lifetrack.media.entity.MediaStatus;
 import com.lifetrack.media.repository.MediaRepository;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -51,9 +53,14 @@ public class MediaService {
         mediaRepository.delete(findOwnedMedia(id, email));
     }
 
-    public List<MediaResponse> searchMedia(String query, MediaStatus status, String email) {
+    public PageResponse<MediaResponse> searchMedia(String query, MediaStatus status, String email, Pageable pageable) {
         String normalized = query == null ? "" : query.trim();
-        return mediaRepository.search(email, normalized, status).stream().map(this::toResponse).toList();
+        return PageResponse.of(mediaRepository.search(email, normalized, status, pageable).map(this::toResponse));
+    }
+
+    /** Every entry, newest first; for the data export. */
+    public List<MediaResponse> getAllMedia(String email) {
+        return mediaRepository.search(email, "", null, Pageable.unpaged()).map(this::toResponse).getContent();
     }
 
     // Another user's media is reported as missing, so ids can't be probed.

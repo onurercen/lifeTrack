@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static com.lifetrack.support.TestUsers.verifiedUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,7 +59,7 @@ class DashboardIntegrationTest {
 
     @Test
     void dashboard_shouldBeEmptyForNewUser() throws Exception {
-        mockMvc.perform(get("/api/dashboard").with(user("test@example.com")))
+        mockMvc.perform(get("/api/dashboard").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.runs.totalCount").value(0))
             .andExpect(jsonPath("$.runs.totalDistanceKm").value(0.0))
@@ -81,7 +81,7 @@ class DashboardIntegrationTest {
         saveRun(other, 42.0, 200, now);
         saveBook(other);
 
-        mockMvc.perform(get("/api/dashboard").with(user("test@example.com")))
+        mockMvc.perform(get("/api/dashboard").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.runs.totalCount").value(3))
             .andExpect(jsonPath("$.runs.totalDistanceKm").value(18.0))
@@ -108,7 +108,7 @@ class DashboardIntegrationTest {
         User other = userRepository.save(new User("Other", "other@example.com", "secret123"));
         saveBook(other, "Başkası", BookStatus.READING, today, null);
 
-        mockMvc.perform(get("/api/dashboard").with(user("test@example.com")))
+        mockMvc.perform(get("/api/dashboard").with(verifiedUser("test@example.com")))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.books.totalCount").value(4))
             .andExpect(jsonPath("$.books.readingCount").value(1))

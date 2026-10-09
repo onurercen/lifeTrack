@@ -6,8 +6,10 @@ import com.lifetrack.book.entity.Book;
 import com.lifetrack.book.entity.BookStatus;
 import com.lifetrack.book.repository.BookRepository;
 import com.lifetrack.common.exception.ApiException;
+import com.lifetrack.common.web.PageResponse;
 import com.lifetrack.user.entity.User;
 import com.lifetrack.user.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -51,9 +53,14 @@ public class BookService {
         bookRepository.delete(findOwnedBook(id, email));
     }
 
-    public List<BookResponse> searchBooks(String query, BookStatus status, String email) {
+    public PageResponse<BookResponse> searchBooks(String query, BookStatus status, String email, Pageable pageable) {
         String normalized = query == null ? "" : query.trim();
-        return bookRepository.search(email, normalized, status).stream().map(this::toResponse).toList();
+        return PageResponse.of(bookRepository.search(email, normalized, status, pageable).map(this::toResponse));
+    }
+
+    /** Every entry, newest first; for the data export. */
+    public List<BookResponse> getAllBooks(String email) {
+        return bookRepository.search(email, "", null, Pageable.unpaged()).map(this::toResponse).getContent();
     }
 
     // Another user's book is reported as missing, so ids can't be probed.

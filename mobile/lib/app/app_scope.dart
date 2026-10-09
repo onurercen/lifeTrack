@@ -2,24 +2,26 @@ import 'package:flutter/widgets.dart';
 
 import '../core/network/api_client.dart';
 import '../core/storage/auth_storage.dart';
+import '../core/utils/file_sharer.dart';
 import '../features/auth/state/auth_controller.dart';
 
 /// Shared app-wide dependencies, available via [AppScope.of].
 class AppDependencies {
-  AppDependencies({required this.api, required this.auth});
+  AppDependencies({required this.api, required this.auth, this.shareFile = shareWithSystem});
 
-  factory AppDependencies.create({ApiClient? api, AuthStorage? storage}) {
+  factory AppDependencies.create({ApiClient? api, AuthStorage? storage, FileSharer? shareFile}) {
     late final AuthController auth;
     final client = api ?? ApiClient(tokenProvider: () => auth.token);
     auth = AuthController(api: client, storage: storage ?? AuthStorage());
     client
       ..onUnauthorized = auth.handleUnauthorized
       ..refreshSession = auth.refreshSession;
-    return AppDependencies(api: client, auth: auth);
+    return AppDependencies(api: client, auth: auth, shareFile: shareFile ?? shareWithSystem);
   }
 
   final ApiClient api;
   final AuthController auth;
+  final FileSharer shareFile;
 
   void dispose() {
     auth.dispose();

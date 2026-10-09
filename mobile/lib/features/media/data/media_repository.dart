@@ -1,4 +1,5 @@
 import '../../../core/network/api_client.dart';
+import '../../../core/network/page_result.dart';
 import '../models/media.dart';
 
 class MediaRepository {
@@ -6,13 +7,14 @@ class MediaRepository {
 
   final ApiClient _api;
 
-  Future<List<Media>> fetchMedia({String? query, MediaStatus? status}) async {
+  Future<PageResult<Media>> fetchMedia({String? query, MediaStatus? status, int page = 0}) async {
     final params = {
+      ...PageResult.query(page),
       if (query != null) 'query': query,
       if (status != null) 'status': status.apiValue,
     };
-    final json = await _api.get('media', query: params.isEmpty ? null : params) as List<dynamic>;
-    return json.map((e) => Media.fromJson(e as Map<String, dynamic>)).toList();
+    final json = await _api.get('media', query: params);
+    return PageResult.fromJson(json as Map<String, dynamic>, Media.fromJson);
   }
 
   Future<Media> createMedia(MediaInput input) async {

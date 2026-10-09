@@ -1,5 +1,22 @@
 import '../../../core/utils/formatters.dart';
 
+/// Totals over all of the user's runs.
+class RunSummary {
+  const RunSummary({required this.totalCount, required this.totalDistanceKm, required this.totalDurationMinutes});
+
+  final int totalCount;
+  final double totalDistanceKm;
+  final int totalDurationMinutes;
+
+  factory RunSummary.fromJson(Map<String, dynamic> json) {
+    return RunSummary(
+      totalCount: (json['totalCount'] as num).toInt(),
+      totalDistanceKm: (json['totalDistanceKm'] as num).toDouble(),
+      totalDurationMinutes: (json['totalDurationMinutes'] as num).toInt(),
+    );
+  }
+}
+
 class Run {
   const Run({
     required this.id,

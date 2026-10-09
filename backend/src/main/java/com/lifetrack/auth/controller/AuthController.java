@@ -1,9 +1,11 @@
 package com.lifetrack.auth.controller;
 
 import com.lifetrack.auth.dto.AuthResponse;
+import com.lifetrack.auth.dto.ForgotPasswordRequest;
 import com.lifetrack.auth.dto.LoginRequest;
 import com.lifetrack.auth.dto.RefreshTokenRequest;
 import com.lifetrack.auth.dto.RegisterRequest;
+import com.lifetrack.auth.dto.ResetPasswordRequest;
 import com.lifetrack.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -41,5 +43,17 @@ public class AuthController {
     public ResponseEntity<Void> logout(@Valid @RequestBody RefreshTokenRequest request) {
         authService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    /** Always 204, whether or not the address belongs to an account. */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request, HttpServletRequest http) {
+        authService.forgotPassword(request.getEmail(), http.getRemoteAddr());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request, HttpServletRequest http) {
+        return ResponseEntity.ok(authService.resetPassword(request, http.getRemoteAddr()));
     }
 }

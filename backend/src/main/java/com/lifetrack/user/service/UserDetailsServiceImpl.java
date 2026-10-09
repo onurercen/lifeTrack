@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    /** Granted once the user confirmed their e-mail; required for everything but the account endpoints. */
+    public static final String EMAIL_VERIFIED = "EMAIL_VERIFIED";
+
     private final UserRepository userRepository;
 
     public UserDetailsServiceImpl(UserRepository userRepository) {
@@ -24,7 +27,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
             .username(user.getEmail())
             .password(user.getPassword())
-            .roles("USER")
+            .authorities(user.isEmailVerified()
+                ? new String[] {"ROLE_USER", EMAIL_VERIFIED}
+                : new String[] {"ROLE_USER"})
             .build();
     }
 }

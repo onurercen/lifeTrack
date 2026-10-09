@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../network/api_exception.dart';
+import '../network/page_result.dart';
 
 /// A filter chip on [EntityListScreen]; a null [value] means "everything".
 class ListFilter {
@@ -13,7 +14,8 @@ class ListFilter {
 }
 
 /// Shared list screen for a user's records: loading / error / empty states,
-/// pull-to-refresh, optional search and filter chips, swipe-to-delete and an add/edit form.
+/// pull-to-refresh, paging while scrolling, optional search and filter chips,
+/// swipe-to-delete and an add/edit form.
 class EntityListScreen<T> extends StatefulWidget {
   const EntityListScreen({
     super.key,
@@ -37,9 +39,9 @@ class EntityListScreen<T> extends StatefulWidget {
   final IconData emptyIcon;
   final String emptyText;
 
-  /// Loads records; [query] is null when search is off or empty, [filter] is
-  /// the selected [ListFilter.value].
-  final Future<List<T>> Function(String? query, String? filter) load;
+  /// Loads page [page] (zero based) of the records; [query] is null when search
+  /// is off or empty, [filter] is the selected [ListFilter.value].
+  final Future<PageResult<T>> Function(String? query, String? filter, int page) load;
   final Future<void> Function(T item) delete;
   final Object Function(T item) idOf;
   final String Function(T item) deletePrompt;
@@ -47,7 +49,10 @@ class EntityListScreen<T> extends StatefulWidget {
 
   /// Builds the add (item == null) or edit form. The form pops `true` after saving.
   final Widget Function(T? item) formBuilder;
-  final Widget Function(List<T> items)? headerBuilder;
+  /// Shown above a non-empty list. [generation] changes whenever the list is
+  /// reloaded or an item is deleted, so a header that loads its own data can
+  /// use it as a key to refresh.
+  final Widget Function(int generation)? headerBuilder;
 
   /// Enables the search field when non-null.
   final String? searchHint;
@@ -61,9 +66,14 @@ class EntityListScreen<T> extends StatefulWidget {
 
 class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
   Timer? _debounce;
   List<T>? _items;
   String? _error;
+  bool _hasNext = false;
+  bool _loadingMore = false;
+  String? _loadMoreError;
+  int _generation = 0;
   late String? _filter = widget.filters?.first.value;
   int _requestId = 0;
 
@@ -75,6 +85,7 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _load();
   }
 
@@ -82,23 +93,75 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
   void dispose() {
     _debounce?.cancel();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
+  /// Loads the first page again (start, refresh, search, filter, after saving).
   Future<void> _load() async {
     // Ignore responses that arrive after a newer search was started.
     final requestId = ++_requestId;
     try {
-      final items = await widget.load(_query, _filter);
+      final page = await widget.load(_query, _filter, 0);
       if (!mounted || requestId != _requestId) return;
       setState(() {
-        _items = items;
+        _items = page.items;
+        _hasNext = page.hasNext;
+        _loadingMore = false;
+        _loadMoreError = null;
         _error = null;
+        _generation++;
       });
+      _fillViewport();
     } on ApiException catch (e) {
       if (!mounted || requestId != _requestId) return;
       setState(() => _error = e.message);
     }
+  }
+
+  Future<void> _loadMore() async {
+    final items = _items;
+    if (items == null || !_hasNext || _loadingMore || _loadMoreError != null) return;
+    final requestId = _requestId;
+    setState(() => _loadingMore = true);
+    // Derived from the count instead of a page counter: after a delete the next
+    // page starts one record earlier, and the overlap is dropped below.
+    final pageIndex = items.length ~/ PageResult.pageSize;
+    try {
+      final page = await widget.load(_query, _filter, pageIndex);
+      if (!mounted || requestId != _requestId) return;
+      final loadedIds = {for (final item in items) widget.idOf(item)};
+      setState(() {
+        _items = [...items, ...page.items.where((item) => !loadedIds.contains(widget.idOf(item)))];
+        _hasNext = page.hasNext;
+        _loadingMore = false;
+      });
+      _fillViewport();
+    } on ApiException catch (e) {
+      if (!mounted || requestId != _requestId) return;
+      setState(() {
+        _loadingMore = false;
+        _loadMoreError = e.message;
+      });
+    }
+  }
+
+  void _retryLoadMore() {
+    setState(() => _loadMoreError = null);
+    _loadMore();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.extentAfter < 400) _loadMore();
+  }
+
+  /// A first page shorter than the screen can't be scrolled, so load more right away.
+  void _fillViewport() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      if (_scrollController.position.maxScrollExtent <= 0) _loadMore();
+    });
   }
 
   void _onSearchChanged(String _) {
@@ -129,7 +192,14 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
     try {
       await widget.delete(item);
       final id = widget.idOf(item);
-      if (mounted) setState(() => _items = _items?.where((i) => widget.idOf(i) != id).toList());
+      if (mounted) {
+        setState(() {
+          _items = _items?.where((i) => widget.idOf(i) != id).toList();
+          _generation++;
+        });
+        // Deleted the last loaded record while more exist on the server.
+        if (_items!.isEmpty && _hasNext) _load();
+      }
       return true;
     } on ApiException catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
@@ -239,12 +309,15 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
 
     final header = widget.headerBuilder;
     final offset = header == null ? 0 : 1;
+    final showFooter = _hasNext || _loadMoreError != null;
     return ListView.builder(
+      controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 96),
-      itemCount: items.length + offset,
+      itemCount: items.length + offset + (showFooter ? 1 : 0),
       itemBuilder: (context, index) {
-        if (header != null && index == 0) return header(items);
+        if (header != null && index == 0) return header(_generation);
+        if (index == items.length + offset) return _buildFooter();
         final item = items[index - offset];
         return Dismissible(
           key: ValueKey(widget.idOf(item)),
@@ -259,6 +332,24 @@ class _EntityListScreenState<T> extends State<EntityListScreen<T>> {
           child: widget.itemBuilder(context, item, () => _openForm(item)),
         );
       },
+    );
+  }
+
+  Widget _buildFooter() {
+    final error = _loadMoreError;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: error == null
+            ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2))
+            : Column(
+                children: [
+                  Text(error, textAlign: TextAlign.center),
+                  const SizedBox(height: 8),
+                  FilledButton.tonal(onPressed: _retryLoadMore, child: const Text('Tekrar dene')),
+                ],
+              ),
+      ),
     );
   }
 }

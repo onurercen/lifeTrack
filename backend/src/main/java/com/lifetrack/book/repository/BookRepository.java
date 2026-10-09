@@ -3,6 +3,8 @@ package com.lifetrack.book.repository;
 import com.lifetrack.book.entity.Book;
 import com.lifetrack.book.entity.BookStatus;
 import com.lifetrack.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,7 +36,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             or lower(b.description) like lower(concat('%', :query, '%')))
         order by b.createdAt desc, b.id desc
         """)
-    List<Book> search(@Param("email") String email, @Param("query") String query, @Param("status") BookStatus status);
+    Page<Book> search(@Param("email") String email, @Param("query") String query, @Param("status") BookStatus status, Pageable pageable);
 
     @Modifying
     @Query("delete from Book b where b.user = :user")

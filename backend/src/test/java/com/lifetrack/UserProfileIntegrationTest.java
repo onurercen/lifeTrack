@@ -7,6 +7,7 @@ import com.lifetrack.book.repository.BookRepository;
 import com.lifetrack.media.repository.MediaRepository;
 import com.lifetrack.run.repository.RunRepository;
 import com.lifetrack.user.repository.UserRepository;
+import com.lifetrack.support.TestMailbox;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,9 @@ class UserProfileIntegrationTest {
     private RefreshTokenRepository refreshTokenRepository;
 
     private String accessToken;
+
+    @Autowired
+    private TestMailbox mailbox;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -114,6 +118,8 @@ class UserProfileIntegrationTest {
     @Test
     void deleteAccount_shouldRemoveUserAndAllTheirData() throws Exception {
         String otherAccess = register("other@test.com").get("token").asText();
+        verifyEmail(accessToken, EMAIL);
+        verifyEmail(otherAccess, "other@test.com");
         for (String path : new String[] {"/api/runs", "/api/books", "/api/media"}) {
             Map<String, Object> payload = switch (path) {
                 case "/api/runs" -> Map.of("distanceKm", 5.0, "durationMinutes", 30);
@@ -147,6 +153,15 @@ class UserProfileIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json(Map.of("name", "Profil", "email", email, "password", "123456"))))
             .andExpect(status().isCreated()));
+    }
+
+    private void verifyEmail(String access, String email) throws Exception {
+        mockMvc.perform(post("/api/users/me/verify-email")
+                .header("Authorization", "Bearer " + access)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of("code", mailbox.lastCode(email)))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.emailVerified").value(true));
     }
 
     private JsonNode login(String email, String password) throws Exception {

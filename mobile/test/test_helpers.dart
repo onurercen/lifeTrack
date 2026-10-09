@@ -31,7 +31,16 @@ http.Response jsonResponse(Object body, [int status = 200]) => http.Response(
       headers: {'content-type': 'application/json; charset=utf-8'},
     );
 
-const testUserJson = {'id': 1, 'name': 'Ayşe', 'email': 'ayse@test.com'};
+/// A list endpoint response: one page holding [items].
+http.Response pageResponse(List<Object?> items, {bool hasNext = false, int page = 0}) => jsonResponse({
+      'items': items,
+      'page': page,
+      'size': 20,
+      'totalItems': items.length,
+      'hasNext': hasNext,
+    });
+
+const testUserJson = {'id': 1, 'name': 'Ayşe', 'email': 'ayse@test.com', 'emailVerified': true};
 
 /// Scrolls the open form until [finder] is built and visible, then taps it.
 Future<void> tapInForm(WidgetTester tester, Finder finder) async {
